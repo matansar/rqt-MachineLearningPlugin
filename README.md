@@ -30,3 +30,5 @@ The code is based on python. So, you need to install the following python packag
       ```{r, engine='sh', count_lines}
    sudo pip install statistics
    ```
+
+need to add chmod +x 
