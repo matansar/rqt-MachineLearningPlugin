@@ -11,6 +11,3 @@ Markup:
      http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment
    * Install RoboTiCan:
      http://wiki.ros.org/robotican/Tutorials/Installation
-
-  
-
