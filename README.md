@@ -14,7 +14,7 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
    
 The code is based on python. So, you need to install the following python packages:
  * install pandas package:
-   * ```{r, engine='sh', count_lines}
+   ```{r, engine='sh', count_lines}
    sudo apt-get install python-pip
    ```
    -- if you have dependence problems, run the following command to fix it:
