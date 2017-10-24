@@ -13,12 +13,12 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * In the first time you open rqt, you need to run: rqt --force-discover
    
 The code is based on python. So, you need to install the following python packages:
-    * install pandas package:
-         * sudo apt-get install python-pip (if you have dependence problems, run: sudo apt-get -f install)
-         * sudo pip install numpy
-         * sudo pip install pandas
-    * install statistics package:
-         * sudo pip install statistics
+ * install pandas package:
+   * sudo apt-get install python-pip (if you have dependence problems, run: sudo apt-get -f install)
+   * sudo pip install numpy
+   * sudo pip install pandas
+ * install statistics package:
+   * sudo pip install statistics
 
 
 ```{r, engine='sh', count_lines}
