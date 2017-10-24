@@ -18,6 +18,6 @@ The code is based on python. So, you need to install the following python packag
     * if you have dependence problems, run: (help)
 
 
-```{r, engine='bash', count_lines}
+```{r, engine='sh', count_lines}
 wc -l en_US.twitter.txt 
 ```
