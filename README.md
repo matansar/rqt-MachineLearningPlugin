@@ -5,13 +5,13 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * Install Indigo ROS distribution: http://wiki.ros.org/indigo/Installation/Ubuntu
  * Install and configure your ROS environment: http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment
  * Install RoboTiCan project: http://wiki.ros.org/robotican/Tutorials/Installation
- * open the linux's terminal (or bash) and run:
+ * open the linux's terminal/bash and run:
    ```{r, engine='sh', count_lines}
    cd ~/catkin_ws/src/
    ```
- * Download or clone this project using terminal (or bash):
+ * Download or clone this project using terminal/bash:
    ```{r, engine='sh', count_lines}
-   clone ...
+   git clone https://github.com/matansar/rqt-MachineLearningPlugin.git
    ```
  * run ./setup
  * move to catkin_ws
