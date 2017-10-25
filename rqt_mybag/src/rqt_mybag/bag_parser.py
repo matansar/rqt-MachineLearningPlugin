@@ -222,9 +222,9 @@ def get_corrent_file_name(filename, suffix, i = -1):
     file_suffix = filename[:-len(suffix)]
     if file_suffix == suffix and i >= 0:
         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
-    elif file_suffix != suffix and i>= 0:
+    elif file_suffix != suffix and i >= 0:
         ret = "%s_%s%s" % (filename, i, suffix)
-    elif file_suffix != suffix and i< 0:
+    elif file_suffix != suffix and i < 0:
         ret = "%s%s" % (filename, suffix)
     else:
         ret = filename
