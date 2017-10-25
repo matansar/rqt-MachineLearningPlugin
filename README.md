@@ -27,7 +27,7 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * Download or clone this project using terminal/bash:
    ```{r, engine='sh', count_lines}
    cd ~/catkin_ws/src/
-   git clone https://github.com/matansar/rqt-MachineLearningPlugin.git
+   git clone https://github.com/matansar/rqt_mlp.git
    ```
  * Run the setup.sh file and compile:
    ```{r, engine='sh', count_lines}
