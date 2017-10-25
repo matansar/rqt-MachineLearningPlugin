@@ -1,2 +1,0 @@
-sleep 2
-rosrun rqt_mybag rqt_mybag
