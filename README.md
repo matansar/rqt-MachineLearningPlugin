@@ -1,15 +1,20 @@
 # Instructions rqt Machine-Learning-Plugin (MLP) #
 This repository offers a new rqt plugin that allows you to produce a dataset for machine learning. <br/>
 #### In order to install the rqt plugin, MLP, please follow the following steps: ####
- * Install Ubuntu 14.04 64-bit.
- * Install Indigo ROS distribution: http://wiki.ros.org/indigo/Installation/Ubuntu
+ * Install Ubuntu 14.04 64-bit
  * Install Indigo ROS distribution: http://wiki.ros.org/indigo/Installation/Ubuntu
  * Install and configure your ROS environment: http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment
- * Install RoboTiCan: http://wiki.ros.org/robotican/Tutorials/Installation
- * move to catkin_ws/src/ 
- * clone this project : clone (add)
+ * Install RoboTiCan project: http://wiki.ros.org/robotican/Tutorials/Installation
+ * open the linux's terminal (or bash) and run:
+   ```{r, engine='sh', count_lines}
+   cd ~/catkin_ws/src/
+   ```
+ * Download or clone this project using terminal (or bash):
+   ```{r, engine='sh', count_lines}
+   clone ...
+   ```
  * run ./setup
- * move to catkin_ws 
+ * move to catkin_ws
  * do: catkin_make
  * In the first time you open rqt, you need to run: rqt --force-discover
    
