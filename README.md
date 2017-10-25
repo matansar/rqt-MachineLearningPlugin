@@ -32,10 +32,9 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * Run the setup.sh file and compile:
    ```{r, engine='sh', count_lines}
    cd ~/catkin_ws/
-   rqt-MachineLearningPlugin/rqt_mlp/install.setup.sh
-   catkin_make
+   rqt_mlp/install.setup.sh
    ```
- * At the first time you open rqt, you need to run:
+ * First time you run rqt, you need to run:
    ```{r, engine='sh', count_lines}
    rqt --force-discover
    ```
