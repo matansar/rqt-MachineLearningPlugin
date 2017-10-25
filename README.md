@@ -8,6 +8,7 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * Install RoboTiCan: http://wiki.ros.org/robotican/Tutorials/Installation
  * move to catkin_ws/src/ 
  * clone this project : clone (add)
+ * run ./setup
  * move to catkin_ws 
  * do: catkin_make
  * In the first time you open rqt, you need to run: rqt --force-discover
