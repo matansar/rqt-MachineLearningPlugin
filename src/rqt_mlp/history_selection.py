@@ -152,16 +152,35 @@ class HistorySelection(QWidget):
                 # if self.item_all.checkState() == Qt.Checked:
                 #    self.item_all.setCheckState(Qt.PartiallyChecked)
 
+
+    def get_current_opened_directory(self,filepath):
+        import os
+        direc = "/"
+        if os.path.isfile(filepath):
+            with open(filepath, 'r') as f:
+                pathes = f.read()
+                direc = pathes.rsplit('/', 1)[0]
+        return direc
+
     def onButtonClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/select_history.log"
         fd = QFileDialog(self)
         wc = "Csv files {.csv} (*.csv)"
         self.files = []
-        tmp_pathes, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.csv'))
+        current_directory = self.get_current_opened_directory(filepath)
+        tmp_pathes, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.csv'), directory=current_directory)
         for path in tmp_pathes:
             self.files.append(path.encode("utf-8"))
         print self.files
         if len(self.files) != 0:
             self.client_answers.setText(self.files[0])
+            with open(filepath, "w") as f:
+                f.write(self.files[0])
+
+            # handler = logging.FileHandler(filepath, mode='w')
+            # logger_topic.addHandler(handler)
+            # logger_topic.info(self.files[0])
         else:
             self.client_answers.setText("")
 
@@ -199,34 +218,52 @@ class HistorySelection(QWidget):
         flag = self.check_files_amount()
         flag = flag & self.check_choose()
         flag = flag & self.check_int(self.window.text(), 3, "Error in Window Time", "That's not a number!")
-        #TODO selected topic not empty
+        # TODO selected topic not empty
+
+        if self._to_save_filename[0] == '':
+            QMessageBox.about(self, "Save CSV", "Select path for saving")
+            flag = False
         return flag
 
     def onSumbitClicked(self):
-        pass
-
-    def onSaveClicked(self):
-        print self.files
-        print self.window.text()
-        print self.group_selected_items.values()
         if not self.check_validation():
             return
 
-        print self.group_selected_items
+        for item in self.group_selected_items.values():
+            if item:
+                for i in item:
+                    self.selected_topics.append(i)
+        # Defined Logging
+        handler = logging.FileHandler('/var/tmp/logger_history.log', mode='w')
+        logger_topic.addHandler(handler)
+        topics = self.selected_topics
+        for topic in topics:
+            logger_topic.info(topic)
+        self.createTimeSeriesFeatures(self.files, self._to_save_filename, int(self.window.text()),
+                                      self.group_selected_items)
 
-        to_save_filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), '.', self.tr('csv (*.csv)'))
-        if to_save_filename[0] != '':
-            for item in self.group_selected_items.values():
-                if item:
-                    for i in item:
-                        self.selected_topics.append(i)
-            # Defined Logging
-            handler = logging.FileHandler('/var/tmp/logger_history.log', mode='w')
-            logger_topic.addHandler(handler)
-            topics = self.selected_topics
-            for topic in topics:
-                logger_topic.info(topic)
-            self.createTimeSeriesFeatures(self.files, to_save_filename,int(self.window.text()), self.group_selected_items)
+    def onSaveClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_history.log"
+        print self.files
+        print self.window.text()
+        print self.group_selected_items.values()
+
+        print self.group_selected_items
+        current_directory = self.get_current_opened_directory(filepath)
+        print current_directory
+        self._to_save_filename = []
+        self._to_save_filename = QFileDialog.getSaveFileName(self,self.tr('csv File'), current_directory, self.tr('csv (*.csv)'))
+        if self._to_save_filename[0] != "":
+            with open(filepath, "w") as f:
+                f.write(self._to_save_filename[0])
+
+            # handler = logging.FileHandler(filepath, mode='w')
+            # logger_topic.addHandler(handler)
+            # print self._to_save_filename[0]
+            # logger_topic.info()
+        self.client_answers1.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
+
 
     def createTimeSeriesFeatures(self, files, to_save_filename, window, group_selected_items):
         import TimeSeriesFeatures as TS
@@ -237,7 +274,6 @@ class HistorySelection(QWidget):
             input_path = files[i]
             output_path = get_corrent_file_name(to_save_filename, ".csv", i)
             print "in = %s out = %s " % (input_path, output_path)
-            self.client_answers1.setText(output_path)
             ts = TS.TimeSeries(input_path, output_path, window, group_selected_items)
             ts.generate_time_series_features()
             if len(files) == 1:
@@ -253,13 +289,16 @@ class HistorySelection(QWidget):
             if checkbox.text() in topics:
                 checkbox.setCheckState(Qt.Checked)
 
-def get_corrent_file_name(filename, suffix, i = -1):
+
+def get_corrent_file_name(filename, suffix, i=-1):
+    if filename == "":
+        return ""
     file_suffix = filename[:-len(suffix)]
     if file_suffix == suffix and i >= 0:
         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
-    elif file_suffix != suffix and i>= 0:
+    elif file_suffix != suffix and i >= 0:
         ret = "%s_%s%s" % (filename, i, suffix)
-    elif file_suffix != suffix and i< 0:
+    elif file_suffix != suffix and i < 0:
         ret = "%s%s" % (filename, suffix)
     else:
         ret = filename
