@@ -693,7 +693,8 @@ class BagTimeline(QGraphicsScene):
 
         self.update()
 
-    def restart_recording(self, restart_flag):
+    def restart_recording(self, restart_flag, path):
+        import os
         self._BagWidget.record_button.setIcon(QIcon.fromTheme('view-refresh'))
         self._BagWidget.record_button.setToolTip("Refresh Screen")
 
@@ -702,6 +703,8 @@ class BagTimeline(QGraphicsScene):
 
         self._BagWidget._restarting = True
         self.handle_close()
+        if path != "":
+            os.remove(path)
         if restart_flag:
             self._BagWidget.apply_restart()
         else:

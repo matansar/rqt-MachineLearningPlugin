@@ -3,11 +3,22 @@ import subprocess
 import time
 import rospy
 from move_base_msgs.msg import MoveBaseActionResult
+from move_base_msgs.msg import MoveBaseActionFeedback
+
+start_scenarios_time = None
+logging_msg = None
+scenario_deadline = None
 
 def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.world"):
+    global start_scenarios_time, logging_msg, scenario_deadline
     source_x, source_y, angle, distance = float(source_x), float(source_y), float(angle), float(distance)
+    # ros_launch = "roslaunch robotican_armadillo armadillo.launch lidar:=true move_base:=true " \
+    #              "gmapping:=true gazebo:=true gui:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
+    start_scenarios_time = rospy.Time.now().to_sec()
+    scenario_deadline = calculate_scenario_deadline(distance, world)
+    logging_msg = "source x = %s, source y = %s, angle = %s, distance = %s, world = %s" % (round(source_x,2), round(source_y,2), round(angle,4), round(distance,2), world)
     ros_launch = "roslaunch robotican_armadillo armadillo.launch lidar:=true move_base:=true " \
-                 "gmapping:=true gazebo:=true gui:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
+                 "gmapping:=true gazebo:=true gui:=true  world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
 
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
@@ -28,30 +39,51 @@ def apply_simulation(scen_obj, distance):
            "pose: { position: { x: %s, y: %s }, orientation: { x: 0, y: 0, z: 0, w: 1 } } }\'" % (distance, 0)
     subprocess.Popen(goal, shell=True)
     rospy.Subscriber("/move_base/result", MoveBaseActionResult, is_arrived, scen_obj)
+    rospy.Subscriber("/move_base/feedback", MoveBaseActionFeedback, check_deadline, scen_obj)
+
+def check_deadline(msg, scen_obj):
+    now = rospy.Time.now().to_sec()
+    current_duration = now - start_scenarios_time
+    if current_duration > scenario_deadline:
+        scen_obj.close_bag(delete=1)
+        print "too much time"
 
 def is_arrived(msg, scen_obj):
-    import inspect, os
+    global logging_msg, start_scenarios_time, scenario_deadline
     if msg.status.status == 3:
-        # TODO need to be removed
-        # time.sleep(2)
+        end_time_scenarios = rospy.Time.now().to_sec()
+        logging_params(logging_msg + ", duration = %s" % (round(end_time_scenarios - start_scenarios_time,2)))
         scen_obj.close_bag()
-
-        # restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Extentions/scripts/restart.sh"
-        # subprocess.Popen(restart_path, shell=True)
-
-        # roscore_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Extentions/scripts/roscore.sh"
-        # subprocess.Popen(roscore_path, shell=True)
-        # close_stat = "killall rosrun"
-        # close_stat = "killall rosrun"
-        # close_rostopic = "killall rostopic"
-        # close = "killall roslaunch"
-        #  TODO delete the function and the arguments
-        # subprocess.Popen(close_stat, shell=True)
-        # subprocess.Popen(close_rostopic, shell=True)
-        # subprocess.Popen(close, shell=True)
-
-        #while True:
         print "shut down"
+
+#in minutes
+def calculate_scenario_deadline(distance, world):
+    delta = 5
+    if world == "empty.world":
+        expected_duration = 9.1669 * distance + 11.614
+    else:
+        expected_duration = 1000
+    return expected_duration + delta
+
+def logging_params(logging_msg):
+    import inspect
+    import logging
+    logging_file = os.path.dirname(
+        os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Extentions/log/scenarios_logger.log"
+    logger = logging.getLogger("scenarios_logger")
+
+    hdlr = logging.FileHandler(logging_file)
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+    hdlr.setFormatter(formatter)
+    logger.addHandler(hdlr)
+    logger.info(logging_msg)
+
+    # if not os.path.isfile(logging_file):
+    #     with open(logging_file, "w") as f:
+    #         pass
+    # with open(logging_file, "a") as f:
+    #     str = "source x = %s, source y = %s, angle = %s, distance = %s, world = %s\n" % (source_x, source_y, angle, distance, world)
+    #     f.write(str)
 
 
 

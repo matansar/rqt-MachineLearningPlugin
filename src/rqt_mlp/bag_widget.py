@@ -124,14 +124,11 @@ class BagWidget(QWidget):
         import inspect, os
         path = os.path.dirname(
         os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/tmp/scenarios_counter.tmp"
-        print "hi1"
         try:
-            print "hi2"
             with open(path, 'r') as f:
                 info = f.read().splitlines()
                 record_filename = info[0]
                 selected_scenario = eval(info[2])
-            print "hi3"
             # time.sleep(10)
             with open("/var/tmp/logger_topic.log", 'r') as f:
                 topics = f.read().splitlines()
