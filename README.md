@@ -28,6 +28,8 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
    ```{r, engine='sh', count_lines}
    cd ~/catkin_ws/src/
    git clone https://github.com/matansar/rqt_mlp.git
+   cd ~/catkin_ws
+   catkin_make
    ```
  * Run the setup.sh file and compile:
    ```{r, engine='sh', count_lines}
