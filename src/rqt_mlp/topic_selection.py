@@ -103,11 +103,16 @@ class TopicSelection(QWidget):
         self.choose_button = QPushButton("Get Last Export Choose", self)
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
 
+        self.clear_button = QPushButton("Clear Selection", self)
+        self.clear_button.clicked.connect(self.onClearClicked)
+
+        self.main_vlayout.addRow(self.choose_button, self.clear_button)
+
         # self.from_nodes_button = QPushButton("From Nodes", self)
         # self.from_nodes_button.clicked.connect(self.onFromNodesButtonClicked)
 
         # self.main_vlayout.addWidget(self.area)
-        self.main_vlayout.addWidget(self.choose_button)
+        # self.main_vlayout.addWidget(self.choose_button)
         self.main_vlayout.addWidget(self.ok_button)
         # self.main_vlayout.addWidget(self.from_nodes_button)
         self.setLayout(self.main_vlayout)
@@ -129,6 +134,9 @@ class TopicSelection(QWidget):
         # print S.get_scenarios_options()
 
         self.show()
+
+    def onClearClicked(self):
+        pass
 
     def onButtonChooseCliked(self):
         for checkbox in self.items_list:

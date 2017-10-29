@@ -255,10 +255,25 @@ class BagWidget(QWidget):
         self.history_selection = HistorySelection()
         # self.topic_selection.recordSettingsSelected.connect(self._on_record_settings_selected)
 
+    def get_current_opened_directory(self, filepath):
+        import os
+        direc = "/"
+        if os.path.isfile(filepath):
+            with open(filepath, 'r') as f:
+                pathes = f.read()
+                direc = pathes.rsplit('/', 1)[0]
+        return direc
+
     def _on_record_settings_selected(self, all_topics, selected_topics, selected_scenario):
         # TODO verify master is still running
-        filename = QFileDialog.getSaveFileName(self, self.tr('Select prefix for new Bag File'), '.', self.tr('Bag files {.bag} (*.bag)'))
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_record.log"
+        current_directory = self.get_current_opened_directory(filepath)
+        filename = QFileDialog.getSaveFileName(self, self.tr('Select prefix for new Bag File'), current_directory,
+                                               self.tr('Bag files {.bag} (*.bag)'))
         if filename[0] != '':
+            with open(filepath, "w") as f:
+                f.write(filename[0])
             record_filename = filename[0].strip()
             if not record_filename.endswith('.bag'):
                 record_filename = record_filename + ".bag"
@@ -288,15 +303,29 @@ class BagWidget(QWidget):
         self.record_button.setToolTip("Pause")
         self.record_button.setIcon(QIcon.fromTheme('media-playback-pause'))
 
+    def get_current_opened_directory(self, filepath):
+        import os
+        direc = "/"
+        if os.path.isfile(filepath):
+            with open(filepath, 'r') as f:
+                pathes = f.read()
+                direc = pathes.rsplit('/', 1)[0]
+        return direc
+
     def _handle_load_clicked(self):
 
         # path = QFileDialog.getOpenFileName(self, self.tr('Load from File'), '.', self.tr('Bag files {.bag} (*.bag)'))
         # path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
-
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/select_bag.log"
+        current_directory = self.get_current_opened_directory(filepath)
         fd = QFileDialog(self)
         wc = "Bag files {.bag} (*.bag)"
-        path, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.bag'))
+        path, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.bag'), directory=current_directory)
         print path
+        if len(path) != 0:
+            with open(filepath, "w") as f:
+                f.write(path[0])
         # if path[0][-4:] == ".bag":   # file
         #     print "True"
         #     self.load_bag(path[0])
@@ -321,6 +350,7 @@ class BagWidget(QWidget):
 
     def get_features_from_bags(self, bag_files):
         bag = rosbag.Bag(bag_files[0])
+
         duration = bag.get_end_time() - bag.get_start_time()
         topics = bag.get_type_and_topic_info().topics
         set_topics = set(topics.keys())

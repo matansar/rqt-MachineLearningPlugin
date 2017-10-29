@@ -50,7 +50,7 @@ class inputDialog(QWidget):
 
     def closeEvent(self, event):
         if not self.button_clicked:
-            self.ParamsSelected.emit({}, 0)
+            self.ParamsSelected.emit([], [], 0)
             print "User has clicked the red x on the main window"
 
     def center(self):

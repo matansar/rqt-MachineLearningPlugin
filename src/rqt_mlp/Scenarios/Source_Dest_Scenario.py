@@ -18,7 +18,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     scenario_deadline = calculate_scenario_deadline(distance, world)
     logging_msg = "source x = %s, source y = %s, angle = %s, distance = %s, world = %s" % (round(source_x,2), round(source_y,2), round(angle,4), round(distance,2), world)
     ros_launch = "roslaunch robotican_armadillo armadillo.launch lidar:=true move_base:=true " \
-                 "gmapping:=true gazebo:=true gui:=true  world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
+                 "gmapping:=true gazebo:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
 
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
@@ -35,11 +35,11 @@ def apply_statistics():
     subprocess.Popen(ros_profiler, shell=True)
 
 def apply_simulation(scen_obj, distance):
-    goal = "rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped \'{ header: { frame_id: \"/map\" }, " \
-           "pose: { position: { x: %s, y: %s }, orientation: { x: 0, y: 0, z: 0, w: 1 } } }\'" % (distance, 0)
+    goal = "rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped \'{ header: { stamp: now, frame_id: \"/map\" }, " \
+           "pose: { position: { x: %s, y: %s, z: 0}, orientation: { x: 0, y: 0, z: 0, w: 1 } } }\'" % (distance, 0)
     subprocess.Popen(goal, shell=True)
     rospy.Subscriber("/move_base/result", MoveBaseActionResult, is_arrived, scen_obj)
-    rospy.Subscriber("/move_base/feedback", MoveBaseActionFeedback, check_deadline, scen_obj)
+    # rospy.Subscriber("/move_base/feedback", MoveBaseActionFeedback, check_deadline, scen_obj)
 
 def check_deadline(msg, scen_obj):
     now = rospy.Time.now().to_sec()
