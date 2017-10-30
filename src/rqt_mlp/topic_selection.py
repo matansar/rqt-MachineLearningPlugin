@@ -2,18 +2,18 @@ import rosgraph
 import RunScenarios as S
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, QCheckBox, QScrollArea, QPushButton
+from python_qt_binding.QtWidgets import QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
+    QCheckBox, QScrollArea, QPushButton
 from .node_selection import NodeSelection
 from MyQCheckBox import MyQCheckBox
 from functools import partial
 from .input_dialog import inputDialog
 import logging
 
-#save choose of user
+# save choose of user
 logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
-
     recordSettingsSelected = Signal(bool, list, dict)
 
     def __init__(self):
@@ -136,7 +136,13 @@ class TopicSelection(QWidget):
         self.show()
 
     def onClearClicked(self):
-        pass
+        self.clearTopicCheckState()
+
+    def clearTopicCheckState(self):
+        for item in self.items_list:
+            item.setCheckState(False)
+        for item in self.group_item_all.values():
+            item.setCheckState(False)
 
     def onButtonChooseCliked(self):
         for checkbox in self.items_list:
@@ -147,7 +153,7 @@ class TopicSelection(QWidget):
             if checkbox.text() in topics:
                 checkbox.setCheckState(Qt.Checked)
 
-    def callConsult(self, params,  id_radio):
+    def callConsult(self, params, id_radio):
         self.input_dialog = inputDialog(params, id_radio)
         self.input_dialog.ParamsSelected.connect(self.params_answer)
         # item, ok = QInputDialog.getItem(self, "select parameter",
@@ -171,7 +177,7 @@ class TopicSelection(QWidget):
             # print params.values()
             a = {}
             print label_items
-            for item, name in zip( params,label_items):
+            for item, name in zip(params, label_items):
                 print item
                 print name
                 # value = params[item].text()
@@ -331,4 +337,3 @@ class TopicSelection(QWidget):
     def getTopicsByName(self, name):
         arr = S.get_topics_options()
         return arr[name]
-

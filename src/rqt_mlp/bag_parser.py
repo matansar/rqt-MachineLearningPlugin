@@ -1,6 +1,6 @@
 import ExtractFeatures as E
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QMessageBox, QLineEdit, QLabel, QFileDialog, QWidget, QVBoxLayout, QCheckBox, QScrollArea, QPushButton
+from python_qt_binding.QtWidgets import QGridLayout, QMessageBox, QLineEdit, QLabel, QFileDialog, QWidget, QVBoxLayout, QCheckBox, QScrollArea, QPushButton
 from MyQCheckBox import MyQCheckBox
 import logging
 
@@ -48,6 +48,11 @@ class BagParser(QWidget):
         self.ok_button = QPushButton("Export To CSV", self)
         #self.ok_button.setFixedSize(150, 30)
         self.ok_button.clicked.connect(self.onButtonClicked)
+
+        self.clear_button = QPushButton("Clear Selection", self)
+        # self.clear_button.resize(self.clear_button.sizeHint())
+        self.clear_button.clicked.connect(self.onClearClicked)
+
         self.choose_button = QPushButton("Get Last Export Choose", self)
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
         self.ok_button.setEnabled(False)
@@ -69,21 +74,35 @@ class BagParser(QWidget):
         self.label5 = QLabel("Duration Time: " + str("%.1f" % duration), self)
         self.label5.setAlignment(Qt.AlignCenter)
 
-        self.main_vlayout = QVBoxLayout(self)
-        self.main_vlayout.addWidget(self.label1)
-        self.main_vlayout.addWidget(self.area)
-        self.main_vlayout.addWidget(self.label2)
-        self.main_vlayout.addWidget(self.areagen)
-        self.main_vlayout.addWidget(self.label3)
-        self.main_vlayout.addWidget(self.areaspec)
-        self.main_vlayout.addWidget(self.choose_button)
-        self.main_vlayout.addWidget(self.label4)
+        # self.main_vlayout = QVBoxLayout(self)
+        self.main_vlayout = QGridLayout(self)
+        self.main_vlayout.addWidget(self.label1, 0, 0)
+        self.main_vlayout.addWidget(self.area, 1, 0)
+        self.main_vlayout.addWidget(self.label2, 0, 1)
+        self.main_vlayout.addWidget(self.areagen, 1, 1)
+        self.main_vlayout.addWidget(self.label3, 2, 0)
+        self.main_vlayout.addWidget(self.areaspec, 3, 0)
+        # self.main_vlayout.addWidget(self.clear_button, 2, 1)
+        # self.main_vlayout.addWidget(self.choose_button, 3, 1)
+        # self.main_vlayout.addWidget(self.label4, 4, 1)
         self.window = QLineEdit(self)
-        self.main_vlayout.addWidget(self.window)
+        # self.main_vlayout.addWidget(self.window, 5, 1)
         self.window.setText("1")
-        self.main_vlayout.addWidget(self.label5)
-        self.main_vlayout.addWidget(self.ok_button)
+        # self.main_vlayout.addWidget(self.label5, 6, 1)
+        # self.main_vlayout.addWidget(self.ok_button, 7, 1)
+
+        self.box = QVBoxLayout()
+        self.box.addStretch(1)
+        self.box.addWidget(self.clear_button)
+        self.box.addWidget(self.choose_button)
+        self.box.addWidget(self.label4)
+        self.box.addWidget(self.window)
+        self.box.addWidget(self.label5)
+        self.box.addWidget(self.ok_button)
+
         #self.main_vlayout.addWidget(self.from_nodes_button)
+
+        self.main_vlayout.addLayout(self.box, 3, 1)
         self.setLayout(self.main_vlayout)
 
         self.selection_vlayout = QVBoxLayout(self)
@@ -121,6 +140,16 @@ class BagParser(QWidget):
         self.areagen.setWidget(self.main_widget1)
         self.areaspec.setWidget(self.main_widget2)
         self.show()
+
+    def onClearClicked(self):
+        self.clearTopicCheckState()
+
+    def clearTopicCheckState(self):
+        for item in self.items_list_topics:
+            item.setCheckState(False)
+        self.item_all.setCheckState(False)
+        self.item_all1.setCheckState(False)
+        self.item_all2.setCheckState(False)
 
     def addCheckBox(self, topic, selection_vlayout, selected_list):
         item = MyQCheckBox(topic, self, selection_vlayout, selected_list)

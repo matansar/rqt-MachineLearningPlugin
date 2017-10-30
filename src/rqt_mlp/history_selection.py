@@ -1,4 +1,3 @@
-
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
 from python_qt_binding.QtWidgets import QFormLayout, QMessageBox, QFileDialog, QLineEdit, QRadioButton, QButtonGroup, \
@@ -11,7 +10,6 @@ logger_topic = logging.getLogger("logger_history")
 
 
 class HistorySelection(QWidget):
-
     def __init__(self):
         super(HistorySelection, self).__init__()
         self.setWindowTitle("Extracting Window Features")
@@ -72,10 +70,15 @@ class HistorySelection(QWidget):
             self.group_main_widget[group_name].setLayout(self.group_selection_vlayout[group_name])
             self.group_areas[group_name].setWidget(self.group_main_widget[group_name])
 
+        self.clear_button = QPushButton("Clear Selection", self)
+        self.clear_button.clicked.connect(self.onClearClicked)
+
         self.choose_button = QPushButton("Get Last Export Choose", self)
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
 
-        self.main_vlayout.addWidget(self.choose_button)
+        self.main_vlayout.addRow(self.clear_button, self.choose_button)
+
+        # self.main_vlayout.addWidget(self.choose_button)
 
         self.label4 = QLabel("Window time", self)
         self.label4.setAlignment(Qt.AlignCenter)
@@ -111,6 +114,15 @@ class HistorySelection(QWidget):
         self.main_vlayout.addWidget(self.submit_button)
 
         self.show()
+
+    def onClearClicked(self):
+        self.clearTopicCheckState()
+
+    def clearTopicCheckState(self):
+        for item in self.items_list:
+            item.setCheckState(False)
+        for item in self.group_item_all.values():
+            item.setCheckState(False)
 
     def MakeCheckBoxList(self, selection_vlayout, selected, topics_Keys, item_all):
         item_all.stateChanged.connect(lambda x: self.updateList(x, item_all, None))
@@ -266,7 +278,6 @@ class HistorySelection(QWidget):
                 # print self._to_save_filename[0]
                 # logger_topic.info()
         self.client_answers1.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
-
 
     def createTimeSeriesFeatures(self, files, to_save_filename, window, group_selected_items):
         import TimeSeriesFeatures as TS
