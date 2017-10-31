@@ -397,8 +397,8 @@ class ExtractFeatures:
     import statistics as stat
     ret = []
     if(specific_features_options['cpu_host'] in self.__specific_selection):
-      for stat in ["Max", "Mean", "Std"]:
-	    self.__update_features_name("%s CPU" % (stat,))
+      for opt in ["Max", "Mean", "Std"]:
+	    self.__update_features_name("%s CPU" % (opt,))
       if len(messages) < 1:
 	ret = self.__default_values(0,3)
       else:
