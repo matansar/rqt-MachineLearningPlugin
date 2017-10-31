@@ -11,7 +11,7 @@ from .input_dialog import inputDialog
 import logging
 
 # save choose of user
-logger_topic = logging.getLogger("logger_topic")
+# logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
     recordSettingsSelected = Signal(bool, list, dict)
@@ -323,11 +323,12 @@ class TopicSelection(QWidget):
         print "-----" + str(self.selected_topics)
 
         # Defined Logging
-        handler = logging.FileHandler('/var/tmp/logger_topic.log', mode='w')
-        logger_topic.addHandler(handler)
+        # handler = logging.FileHandler('/var/tmp/logger_topic.log', mode='a')
+        # logger_topic.addHandler(handler)
         topics = self.selected_topics
-        for topic in topics:
-            logger_topic.info(topic)
+        with open('/var/tmp/logger_topic.log', "w") as f:
+            for topic in topics:
+                f.write(topic + "\n")
         self.close()
         self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
 

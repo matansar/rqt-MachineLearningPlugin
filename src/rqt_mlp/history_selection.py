@@ -6,7 +6,7 @@ from MyQCheckBox import MyQCheckBox
 import logging
 
 # save choose of user
-logger_topic = logging.getLogger("logger_history")
+# logger_topic = logging.getLogger("logger_history")
 
 
 class HistorySelection(QWidget):
@@ -242,17 +242,18 @@ class HistorySelection(QWidget):
     def onSumbitClicked(self):
         if not self.check_validation():
             return
-
+        self.selected_topics = []
         for item in self.group_selected_items.values():
             if item:
                 for i in item:
                     self.selected_topics.append(i)
         # Defined Logging
-        handler = logging.FileHandler('/var/tmp/logger_history.log', mode='w')
-        logger_topic.addHandler(handler)
+        # handler = logging.FileHandler('/var/tmp/logger_history.log', mode='a')
+        # logger_topic.addHandler(handler)
         topics = self.selected_topics
-        for topic in topics:
-            logger_topic.info(topic)
+        with open('/var/tmp/logger_history.log', "w") as f:
+            for topic in topics:
+                f.write(topic + "\n")
         self.createTimeSeriesFeatures(self.files, self._to_save_filename, int(self.window.text()),
                                       self.group_selected_items)
 

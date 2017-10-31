@@ -5,7 +5,7 @@ from MyQCheckBox import MyQCheckBox
 import logging
 
 #save choose of user
-logger_topic = logging.getLogger("logger")
+# logger_topic = logging.getLogger("logger")
 
 class BagParser(QWidget):
 
@@ -187,19 +187,30 @@ class BagParser(QWidget):
                 item_clicked.selected_list.remove(topic)
                 #if self.item_all.checkState() == Qt.Checked:
                 #    self.item_all.setCheckState(Qt.PartiallyChecked)
-
-        if self.selected_specific_features != []:
-            if self.selected_bag_topics == [] and self.selected_general_features == []:
-                self.ok_button.setEnabled(True)
-            elif self.selected_bag_topics != [] and self.selected_general_features != []:
-                self.ok_button.setEnabled(True)
-            else:
+        if self.selected_bag_topics != []:
+            if self.selected_specific_features == [] and self.selected_general_features == []:
                 self.ok_button.setEnabled(False)
+            else:
+                self.ok_button.setEnabled(True)
+            # elif self.selected_specific_features != [] and self.selected_general_features == []:
+            #     self.ok_button.setEnabled(True)
+            # elif self.selected_specific_features == [] and self.selected_general_features != []:
+            #     self.ok_button.setEnabled(True)
         else:
-            if self.selected_bag_topics == [] or self.selected_general_features == []:
-                self.ok_button.setEnabled(False)
-            else:
-                self.ok_button.setEnabled(True)
+            self.ok_button.setEnabled(False)
+
+        # if self.selected_specific_features != []:
+        #     if self.selected_bag_topics == [] and self.selected_general_features == []:
+        #         self.ok_button.setEnabled(True)
+        #     elif self.selected_bag_topics != [] and self.selected_general_features != []:
+        #         self.ok_button.setEnabled(True)
+        #     else:
+        #         self.ok_button.setEnabled(False)
+        # else:
+        #     if self.selected_bag_topics == [] or self.selected_general_features == []:
+        #         self.ok_button.setEnabled(False)
+        #     else:
+        #         self.ok_button.setEnabled(True)
 
     def onButtonChooseCliked(self):
         for checkbox in self.items_list_topics:
@@ -210,7 +221,19 @@ class BagParser(QWidget):
             if checkbox.text() in topics:
                 checkbox.setCheckState(Qt.Checked)
 
+    def get_current_opened_directory(self, filepath):
+        import os
+        direc = "/"
+        if os.path.isfile(filepath):
+            with open(filepath, 'r') as f:
+                pathes = f.read()
+                direc = pathes.rsplit('/', 1)[0]
+        return direc
+
     def onButtonClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_csv.log"
+        current_directory = self.get_current_opened_directory(filepath)
         window = self.window.text()
         try:
             val = float(window)
@@ -221,19 +244,22 @@ class BagParser(QWidget):
             QMessageBox.about(self, "Error in Window Time", "time need to be smaller than: " + str(self.duration))
             return
         # Defined Logging
-        handler = logging.FileHandler('/var/tmp/logger.log', mode='w')
-        logger_topic.addHandler(handler)
-        filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), '.', self.tr('csv (*.csv)'))
+        # handler = logging.FileHandler('/var/tmp/logger.log', mode='a')
+        # logger_topic.addHandler(handler)
+        filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory, self.tr('csv (*.csv)'))
         if filename[0] != '':
+            with open(filepath, "w") as f:
+                f.write(filename[0])
             topics = self.selected_bag_topics
             specific_features_selection = self.selected_specific_features
             general_features_selection = self.selected_general_features
-            for topic in topics:
-                logger_topic.info(topic)
-            for topic in specific_features_selection:
-                logger_topic.info(topic)
-            for topic in general_features_selection:
-                logger_topic.info(topic)
+            with open('/var/tmp/logger.log', "w") as f:
+                for topic in topics:
+                    f.write(topic + "\n")
+                for topic1 in specific_features_selection:
+                    f.write(topic1 + "\n")
+                for topic2 in general_features_selection:
+                    f.write(topic2 + "\n")
             ef = E.ExtractFeatures(topics, float(window), specific_features_selection, general_features_selection)
             counter = 0
             for bag_file in self.bag_files:
