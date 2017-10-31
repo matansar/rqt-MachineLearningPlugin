@@ -23,10 +23,15 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
-    time.sleep(10)
+    time.sleep(7)
+    run_rviz()
     apply_statistics()
     apply_simulation(scen_obj, distance)
     scen_obj.generate_bag()
+
+def run_rviz():
+    rviz = "rosrun rviz rviz -d /home/lab/dwa.rviz"
+    subprocess.Popen(rviz, shell=True)
 
 def apply_statistics():
     enable_statistics = "rosparam set enable_statistics true"

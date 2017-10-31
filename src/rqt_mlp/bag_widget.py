@@ -355,7 +355,6 @@ class BagWidget(QWidget):
 
     def get_features_from_bags(self, bag_files):
         bag = rosbag.Bag(bag_files[0])
-
         duration = bag.get_end_time() - bag.get_start_time()
         topics = bag.get_type_and_topic_info().topics
         set_topics = set(topics.keys())
