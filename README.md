@@ -48,3 +48,8 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
    cd ~/catkin_ws/
    rqt --force-discover
    ```
+   You should run roscore before:
+   ```{r, engine='sh', count_lines}
+   roscore
+   ```
+   
