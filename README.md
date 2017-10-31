@@ -7,7 +7,7 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * Install RoboTiCan project: http://wiki.ros.org/robotican/Tutorials/Installation
  * Install python and then the following python packages:
     * Install pandas package:
-      ```{r, engine='sh', count_lines}
+      ```{r, engine='bash', count_lines}
       sudo apt-get install python-pip
       ```
       -- if you have dependence problems, run the following command to fix it:
