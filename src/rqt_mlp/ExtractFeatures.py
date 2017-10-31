@@ -262,6 +262,7 @@ class ExtractFeatures:
   #feature 6
   def __age_messages(self, topic, messages):
     import statistics as stat
+    NO_AGE_MEAN = 0
     self.__update_features_name("Messages-Age(%s)" % topic)
     ages = []
     for topic, m, t in messages:
@@ -271,7 +272,10 @@ class ExtractFeatures:
 	ages.append(arrival_time - send_time)
       else:
 	ages.append(0)
-    return stat.mean(ages)
+    if len(ages) > 0:
+      return stat.mean(ages)
+    else:
+      return NO_AGE_MEAN
     
 
 # -------------------------------------------- features type 1 -------------------------------------------------------------------
