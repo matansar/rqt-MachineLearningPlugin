@@ -248,7 +248,10 @@ class BagParser(QWidget):
         # df = ef.generate_features(self.bag_file)
 
 def get_corrent_file_name(filename, suffix, i = -1):
-    file_suffix = filename[:-len(suffix)]
+    if filename == "":
+        return ""
+    file_suffix = filename[-len(suffix):]
+    print file_suffix
     if file_suffix == suffix and i >= 0:
         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
     elif file_suffix != suffix and i >= 0:

@@ -307,7 +307,7 @@ class HistorySelection(QWidget):
 def get_corrent_file_name(filename, suffix, i=-1):
     if filename == "":
         return ""
-    file_suffix = filename[:-len(suffix)]
+    file_suffix = filename[-len(suffix):]
     if file_suffix == suffix and i >= 0:
         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
     elif file_suffix != suffix and i >= 0:

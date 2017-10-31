@@ -121,8 +121,8 @@ class BagTimeline(QGraphicsScene):
         """
         Cleans up the timeline, bag and any threads
         """
-        with open("/var/tmp/test.txt", "a") as myfile:
-            myfile.write("dan\n")
+        # with open("/var/tmp/test.txt", "a") as myfile:
+        #     myfile.write("dan\n")
 
         if self.__closed:
             return
@@ -697,6 +697,7 @@ class BagTimeline(QGraphicsScene):
         import os
         self._BagWidget.record_button.setIcon(QIcon.fromTheme('view-refresh'))
         self._BagWidget.record_button.setToolTip("Refresh Screen")
+        self._BagWidget.restart_button.setEnabled(False)
 
         self._BagWidget.load_button.setEnabled(True)
         self._BagWidget.history_button.setEnabled(True)

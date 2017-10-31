@@ -66,6 +66,7 @@ class BagWidget(QWidget):
         self.history_button.setIcon(QIcon.fromTheme('insert-image'))
         self.load_button.setIcon(QIcon.fromTheme('document-open'))
         self.restart_button.setIcon(QIcon.fromTheme('view-refresh'))
+        self.restart_button.setEnabled(False)
         # self.save_button.setIcon(QIcon.fromTheme('document-save'))
 
         # self.play_button.clicked[bool].connect(self._handle_play_clicked)
@@ -299,6 +300,7 @@ class BagWidget(QWidget):
 
         self.load_button.setEnabled(False)
         self.history_button.setEnabled(False)
+        self.restart_button.setEnabled(True)
 
         # selected_topics.append("/cmd_vel")
         # self._timeline.record_bag(record_filename, all_topics, selected_topics)
@@ -392,7 +394,7 @@ class BagWidget(QWidget):
         # self.slower_button.setEnabled(True)
         # self.begin_button.setEnabled(True)
         # self.end_button.setEnabled(True)
-        # self.save_button.setEnabled(True)
+        # self.save_button.setEnabled(True)h
         self.record_button.setEnabled(False)
         self._timeline.add_bag(bag)
         qWarning("Done loading %s" % filename )
