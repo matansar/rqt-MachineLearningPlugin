@@ -1,6 +1,6 @@
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QFormLayout, QMessageBox, QFileDialog, QLineEdit, QRadioButton, QButtonGroup, \
+from python_qt_binding.QtWidgets import QHBoxLayout, QFormLayout, QMessageBox, QFileDialog, QLineEdit, QRadioButton, QButtonGroup, \
     QLabel, QWidget, QVBoxLayout, QCheckBox, QScrollArea, QPushButton
 from MyQCheckBox import MyQCheckBox
 import logging
@@ -8,7 +8,7 @@ import logging
 # save choose of user
 # logger_topic = logging.getLogger("logger_history")
 
-
+ccccc = 0
 class HistorySelection(QWidget):
     def __init__(self):
         super(HistorySelection, self).__init__()
@@ -29,7 +29,7 @@ class HistorySelection(QWidget):
         self.group_main_widget = dict()
         self.group_selection_vlayout = dict()
         self.group_item_all = dict()
-        self.main_vlayout = QFormLayout(self)
+        self.main_vlayout = QVBoxLayout(self)
         self.group_label = dict()
 
         self.items_list = []
@@ -47,7 +47,15 @@ class HistorySelection(QWidget):
         self.ok_button = QPushButton("Select CSV...", self)
         self.ok_button.clicked.connect(self.onButtonClicked)
 
-        self.main_vlayout.addRow(self.ok_button, self.client_answers)
+        self.two_buttons1 = QHBoxLayout(self)
+
+        self.two_buttons1.addWidget(self.ok_button)
+
+        self.two_buttons1.addWidget(self.client_answers)
+
+        self.main_vlayout.addLayout(self.two_buttons1)
+
+        # self.main_vlayout.addRow(self.ok_button, self.client_answers)
 
         # self.main_vlayout.addWidget(self.ok_button)
 
@@ -76,7 +84,7 @@ class HistorySelection(QWidget):
         self.choose_button = QPushButton("Get Last Export Choose", self)
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
 
-        self.main_vlayout.addRow(self.clear_button, self.choose_button)
+
 
         # self.main_vlayout.addWidget(self.choose_button)
 
@@ -89,7 +97,30 @@ class HistorySelection(QWidget):
         # self.main_vlayout.addWidget(self.window)
         self.window.setText("3")
 
-        self.main_vlayout.addRow(self.label4, self.window)
+        self.label5 = QLabel("Duration Time:", self)
+        self.label5.setAlignment(Qt.AlignCenter)
+
+        self.two_buttons3 = QHBoxLayout(self)
+
+        self.two_buttons3.addWidget(self.label4)
+
+        self.two_buttons3.addWidget(self.window)
+
+        self.two_buttons3.addWidget(self.label5)
+
+        self.main_vlayout.addLayout(self.two_buttons3)
+
+        # self.main_vlayout.addRow(self.label4, self.window)
+
+        self.two_buttons = QHBoxLayout(self)
+
+        self.two_buttons.addWidget(self.choose_button)
+
+        self.two_buttons.addWidget(self.clear_button)
+
+        self.main_vlayout.addLayout(self.two_buttons)
+
+        # self.main_vlayout.addRow(self.clear_button, self.choose_button)
 
         # self.label5 = QLabel("Load CSV", self)
         # self.label5.setAlignment(Qt.AlignCenter)
@@ -109,11 +140,28 @@ class HistorySelection(QWidget):
 
         # self.main_vlayout.addWidget(self.save_button)
 
-        self.main_vlayout.addRow(self.save_button, self.client_answers1)
+        self.two_buttons2 = QHBoxLayout(self)
+
+        self.two_buttons2.addWidget(self.save_button)
+
+        self.two_buttons2.addWidget(self.client_answers1)
+
+        self.main_vlayout.addLayout(self.two_buttons2)
+
+
+        # self.main_vlayout.addRow(self.save_button, self.client_answers1)
 
         self.main_vlayout.addWidget(self.submit_button)
 
         self.show()
+
+
+    def get_min_rows_csv(self, files):
+        global ccccc
+        ccccc = ccccc + 1
+        number = ccccc
+        self.label5.setText("Duration Time: %s" % number)
+        pass
 
     def onClearClicked(self):
         self.clearTopicCheckState()
@@ -188,6 +236,7 @@ class HistorySelection(QWidget):
             self.files.append(path.encode("utf-8"))
         print self.files
         if len(self.files) != 0:
+            self.get_min_rows_csv(tmp_pathes)
             self.client_answers.setText(self.files[0])
             with open(filepath, "w") as f:
                 f.write(self.files[0])

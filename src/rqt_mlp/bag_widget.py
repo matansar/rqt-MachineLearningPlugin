@@ -63,7 +63,11 @@ class BagWidget(QWidget):
         # self.zoom_all_button.setIcon(QIcon.fromTheme('zoom-original'))
         # self.thumbs_button.setIcon(QIcon.fromTheme('insert-image'))
         self.record_button.setIcon(QIcon.fromTheme('media-record'))
-        self.history_button.setIcon(QIcon.fromTheme('insert-image'))
+        # self.history_button.setIcon(QIcon.fromTheme('insert-image'))
+        import inspect
+        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/extract-features-icon.gif"
+        icon = QIcon(path)
+        self.history_button.setIcon(QIcon(icon))
         self.load_button.setIcon(QIcon.fromTheme('document-open'))
         self.restart_button.setIcon(QIcon.fromTheme('view-refresh'))
         self.restart_button.setEnabled(False)
@@ -245,7 +249,7 @@ class BagWidget(QWidget):
         self.topic_selection.recordSettingsSelected.connect(self._on_record_settings_selected)
 
     def apply_restart(self):
-        import inspect, os, subprocess
+        import inspect, subprocess
         restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/scripts/restart.sh"
         subprocess.Popen(restart_path, shell=True)
 
@@ -269,7 +273,7 @@ class BagWidget(QWidget):
 
     def _on_record_settings_selected(self, all_topics, selected_topics, selected_scenario):
         # TODO verify master is still running
-        import inspect, os
+        import inspect
         filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_record.log"
         current_directory = self.get_current_opened_directory(filepath)
         filename = QFileDialog.getSaveFileName(self, self.tr('Select prefix for new Bag File'), current_directory,
@@ -308,7 +312,6 @@ class BagWidget(QWidget):
         self.record_button.setIcon(QIcon.fromTheme('media-playback-pause'))
 
     def get_current_opened_directory(self, filepath):
-        import os
         direc = "/"
         if os.path.isfile(filepath):
             with open(filepath, 'r') as f:
@@ -323,7 +326,7 @@ class BagWidget(QWidget):
     def _handle_load_clicked(self):
         # path = QFileDialog.getOpenFileName(self, self.tr('Load from File'), '.', self.tr('Bag files {.bag} (*.bag)'))
         # path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
-        import inspect, os
+        import inspect
         filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/select_bag.log"
         current_directory = self.get_current_opened_directory(filepath)
         fd = QFileDialog(self)
@@ -479,7 +482,7 @@ class BagWidget(QWidget):
 
 
     def remove_tmp_files(self):
-        import glob, inspect, os
+        import glob, inspect
         tmp_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/tmp/"
         print tmp_path
         files = glob.glob('%s*'% tmp_path)
@@ -489,7 +492,7 @@ class BagWidget(QWidget):
 
     # Shutdown all members
     def shutdown_all(self):
-        import inspect, os, subprocess
+        import inspect, subprocess
         restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/scripts/clean.sh"
         self.remove_tmp_files()
         print "dead shot"

@@ -2,7 +2,7 @@ import rosgraph
 import RunScenarios as S
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
+from python_qt_binding.QtWidgets import QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
     QCheckBox, QScrollArea, QPushButton
 from .node_selection import NodeSelection
 from MyQCheckBox import MyQCheckBox
@@ -20,7 +20,7 @@ class TopicSelection(QWidget):
         super(TopicSelection, self).__init__()
         master = rosgraph.Master('rqt_bag_recorder')
         self.setWindowTitle("Record a Simulation")
-        self.resize(960, 720)
+        self.resize(650, 720)
 
         pre = TS.get_time_series_pre_feature_options()
         glob = TS.get_global_time_series_features_options()
@@ -36,7 +36,7 @@ class TopicSelection(QWidget):
         self.group_selection_vlayout = dict()
         self.group_item_all = dict()
         # self.main_vlayout = QVBoxLayout(self)
-        self.main_vlayout = QFormLayout(self)
+        self.main_vlayout = QVBoxLayout(self)
 
         self.group_label = dict()
 
@@ -106,7 +106,15 @@ class TopicSelection(QWidget):
         self.clear_button = QPushButton("Clear Selection", self)
         self.clear_button.clicked.connect(self.onClearClicked)
 
-        self.main_vlayout.addRow(self.choose_button, self.clear_button)
+        self.choose_clear_buttons = QHBoxLayout(self)
+
+        self.choose_clear_buttons.addWidget(self.choose_button)
+
+        self.choose_clear_buttons.addWidget(self.clear_button)
+
+        self.main_vlayout.addLayout(self.choose_clear_buttons)
+
+        # self.main_vlayout.addRow(self.choose_button, self.clear_button)
 
         # self.from_nodes_button = QPushButton("From Nodes", self)
         # self.from_nodes_button.clicked.connect(self.onFromNodesButtonClicked)
