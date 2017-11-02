@@ -8,7 +8,6 @@ import logging
 # save choose of user
 # logger_topic = logging.getLogger("logger_history")
 
-ccccc = 0
 class HistorySelection(QWidget):
     def __init__(self):
         super(HistorySelection, self).__init__()
@@ -156,13 +155,13 @@ class HistorySelection(QWidget):
         self.show()
 
 
-    def get_min_rows_csv(self, files):
-        global ccccc
-        ccccc = ccccc + 1
-        number = ccccc
-        self.label5.setText("Duration Time: %s" % number)
-        pass
-
+    def get_min_rows_csv(self, csv_files):
+        import pandas as pd
+        dfs = map(lambda x: pd.read_csv(x, header=0), csv_files)
+        number = dfs[0].shape[0]
+        number = reduce(lambda acc,curr: min(acc,curr.shape[0]), dfs, number)
+	self.label5.setText("Duration Time: %s" % number)
+        
     def onClearClicked(self):
         self.clearTopicCheckState()
 
