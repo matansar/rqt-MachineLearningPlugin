@@ -57,16 +57,16 @@ class BagParser(QWidget):
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
         self.ok_button.setEnabled(False)
 
-        self.label1 = QLabel("Choose topic from bag file", self)
+        self.label1 = QLabel("Select topic from bag(s)", self)
         self.label1.setAlignment(Qt.AlignCenter)
 
-        self.label2 = QLabel("Choose statistics features on the above topics", self)
+        self.label2 = QLabel("Statistics Features", self)
         self.label2.setAlignment(Qt.AlignCenter)
 
-        self.label3 = QLabel("Choose more specific features on the above topics", self)
+        self.label3 = QLabel("Specific Features", self)
         self.label3.setAlignment(Qt.AlignCenter)
 
-        self.label4 = QLabel("Window time", self)
+        self.label4 = QLabel("Window Time", self)
         self.label4.setAlignment(Qt.AlignCenter)
 
         self.duration = duration
