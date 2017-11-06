@@ -8,6 +8,7 @@ options = None
 
 UniFeatures = "Univariate Features"
 MultiFeatures = "Multivariate Features"
+step = 2
 
 class TimeSeries:
   
@@ -19,6 +20,7 @@ class TimeSeries:
     self.__input_path = input_path
     self.__output_path = output_path
     self.__window = window
+    self.__step = step
     self.__time_series_features_name = []
     #print time_series_features_selection[UniFeatures]
     self.set_univariate_features_selection(time_series_features_selection[UniFeatures])
@@ -57,8 +59,9 @@ class TimeSeries:
     features_names, dataset = TimeSeries.__read_data_set(self.__input_path)
     l = len(dataset)
     if l >= self.__window:
-      for i in range(0, l - self.__window + 1):
-	time_series_features = self.__generate_time_series_feature(features_names, dataset[i: i + self.__window])
+      for i in range(0, l - self.__window + 1, self.__step):
+	jumping = i + self.__window
+	time_series_features = self.__generate_time_series_feature(features_names, dataset[i: jumping])
 	df = df.append([time_series_features])
     else:
       print('ERROR: window size is too big for this dataset')
