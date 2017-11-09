@@ -1,6 +1,6 @@
 import ExtractFeatures as E
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QGridLayout, QMessageBox, QLineEdit, QLabel, QFileDialog, QWidget, QVBoxLayout, QCheckBox, QScrollArea, QPushButton
+from python_qt_binding.QtWidgets import QHBoxLayout, QGridLayout, QMessageBox, QLineEdit, QLabel, QFileDialog, QWidget, QVBoxLayout, QCheckBox, QScrollArea, QPushButton
 from MyQCheckBox import MyQCheckBox
 import logging
 
@@ -66,43 +66,65 @@ class BagParser(QWidget):
         self.label3 = QLabel("Specific Features", self)
         self.label3.setAlignment(Qt.AlignCenter)
 
-        self.label4 = QLabel("Window Time", self)
-        self.label4.setAlignment(Qt.AlignCenter)
-
         self.duration = duration
 
         self.label5 = QLabel("Duration Time: " + str("%.1f" % duration), self)
         self.label5.setAlignment(Qt.AlignCenter)
 
-        # self.main_vlayout = QVBoxLayout(self)
-        self.main_vlayout = QGridLayout(self)
-        self.main_vlayout.addWidget(self.label1, 0, 0)
-        self.main_vlayout.addWidget(self.area, 1, 0)
-        self.main_vlayout.addWidget(self.label2, 0, 1)
-        self.main_vlayout.addWidget(self.areagen, 1, 1)
-        self.main_vlayout.addWidget(self.label3, 2, 0)
-        self.main_vlayout.addWidget(self.areaspec, 3, 0)
-        # self.main_vlayout.addWidget(self.clear_button, 2, 1)
-        # self.main_vlayout.addWidget(self.choose_button, 3, 1)
-        # self.main_vlayout.addWidget(self.label4, 4, 1)
-        self.window = QLineEdit(self)
-        # self.main_vlayout.addWidget(self.window, 5, 1)
-        self.window.setText("1")
-        # self.main_vlayout.addWidget(self.label5, 6, 1)
-        # self.main_vlayout.addWidget(self.ok_button, 7, 1)
+        self.main_vlayout = QVBoxLayout(self)
+        # self.main_vlayout = QGridLayout(self)
+        self.main_vlayout.addWidget(self.label1)
+        self.main_vlayout.addWidget(self.area)
+        self.main_vlayout.addWidget(self.label2)
+        self.main_vlayout.addWidget(self.areagen)
+        self.main_vlayout.addWidget(self.label3)
+        self.main_vlayout.addWidget(self.areaspec)
 
-        self.box = QVBoxLayout()
-        self.box.addStretch(1)
-        self.box.addWidget(self.clear_button)
-        self.box.addWidget(self.choose_button)
-        self.box.addWidget(self.label4)
-        self.box.addWidget(self.window)
-        self.box.addWidget(self.label5)
-        self.box.addWidget(self.ok_button)
+        self.label4 = QLabel("Window time", self)
+        self.label4.setAlignment(Qt.AlignCenter)
+
+        # self.main_vlayout.addWidget(self.label4)
+
+        self.window = QLineEdit(self)
+        # self.main_vlayout.addWidget(self.window)
+        self.window.setText("1")
+
+        self.windows_time_3 = QHBoxLayout(self)
+
+        self.windows_time_3.addWidget(self.label4)
+
+        self.windows_time_3.addWidget(self.window)
+
+        self.windows_time_3.addWidget(self.label5)
+
+        self.main_vlayout.addLayout(self.windows_time_3)
+
+        # self.window = QLineEdit(self)
+        # self.window.setText("1")
+
+        # self.box = QVBoxLayout()
+        # self.box.addStretch(1)
+        # self.box.addWidget(self.clear_button)
+        # self.box.addWidget(self.choose_button)
+        # self.box.addWidget(self.label4)
+        # self.box.addWidget(self.window)
+        # self.box.addWidget(self.label5)
+        # self.box.addWidget(self.ok_button)
 
         #self.main_vlayout.addWidget(self.from_nodes_button)
 
-        self.main_vlayout.addLayout(self.box, 3, 1)
+        # self.main_vlayout.addLayout(self.box)
+
+        self.two_buttons = QHBoxLayout(self)
+
+        self.two_buttons.addWidget(self.choose_button)
+
+        self.two_buttons.addWidget(self.clear_button)
+
+        self.main_vlayout.addLayout(self.two_buttons)
+
+        self.main_vlayout.addWidget(self.ok_button)
+
         self.setLayout(self.main_vlayout)
 
         self.selection_vlayout = QVBoxLayout(self)
