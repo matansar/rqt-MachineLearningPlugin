@@ -37,11 +37,11 @@ class HistorySelection(QWidget):
 
         # layout = QFormLayout()
 
-        self.client_answers = QLineEdit()
-        self.client_answers1 = QLineEdit()
+        self.select_path = QLineEdit()
+        self.save_path = QLineEdit()
 
-        self.client_answers.setEnabled(False)
-        self.client_answers1.setEnabled(False)
+        self.select_path.setEnabled(False)
+        self.save_path.setEnabled(False)
 
         self.ok_button = QPushButton("Select CSV...", self)
         self.ok_button.clicked.connect(self.onButtonClicked)
@@ -50,7 +50,7 @@ class HistorySelection(QWidget):
 
         self.two_buttons1.addWidget(self.ok_button)
 
-        self.two_buttons1.addWidget(self.client_answers)
+        self.two_buttons1.addWidget(self.select_path)
 
         self.main_vlayout.addLayout(self.two_buttons1)
 
@@ -99,15 +99,15 @@ class HistorySelection(QWidget):
         self.label5 = QLabel("Duration Time:", self)
         self.label5.setAlignment(Qt.AlignCenter)
 
-        self.two_buttons3 = QHBoxLayout(self)
+        self.windows_time_3 = QHBoxLayout(self)
 
-        self.two_buttons3.addWidget(self.label4)
+        self.windows_time_3.addWidget(self.label4)
 
-        self.two_buttons3.addWidget(self.window)
+        self.windows_time_3.addWidget(self.window)
 
-        self.two_buttons3.addWidget(self.label5)
+        self.windows_time_3.addWidget(self.label5)
 
-        self.main_vlayout.addLayout(self.two_buttons3)
+        self.main_vlayout.addLayout(self.windows_time_3)
 
         # self.main_vlayout.addRow(self.label4, self.window)
 
@@ -143,7 +143,7 @@ class HistorySelection(QWidget):
 
         self.two_buttons2.addWidget(self.save_button)
 
-        self.two_buttons2.addWidget(self.client_answers1)
+        self.two_buttons2.addWidget(self.save_path)
 
         self.main_vlayout.addLayout(self.two_buttons2)
 
@@ -236,7 +236,7 @@ class HistorySelection(QWidget):
         print self.files
         if len(self.files) != 0:
             self.get_min_rows_csv(tmp_pathes)
-            self.client_answers.setText(self.files[0])
+            self.select_path.setText(self.files[0])
             with open(filepath, "w") as f:
                 f.write(self.files[0])
 
@@ -244,7 +244,7 @@ class HistorySelection(QWidget):
                 # logger_topic.addHandler(handler)
                 # logger_topic.info(self.files[0])
         else:
-            self.client_answers.setText("")
+            self.select_path.setText("")
 
     def check_int(self, number, condition, title, message_body):
         try:
@@ -326,7 +326,7 @@ class HistorySelection(QWidget):
                 # logger_topic.addHandler(handler)
                 # print self._to_save_filename[0]
                 # logger_topic.info()
-        self.client_answers1.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
+        self.save_path.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
 
     def createTimeSeriesFeatures(self, files, to_save_filename, window, group_selected_items):
         import TimeSeriesFeatures as TS
