@@ -243,9 +243,6 @@ class BagParser(QWidget):
         if val >= self.duration:
             QMessageBox.about(self, "Error in Window Time", "time need to be smaller than: " + str(self.duration))
             return
-        # Defined Logging
-        # handler = logging.FileHandler('/var/tmp/logger.log', mode='a')
-        # logger_topic.addHandler(handler)
         filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory, self.tr('csv (*.csv)'))
         if filename[0] != '':
             with open(filepath, "w") as f:
@@ -271,7 +268,6 @@ class BagParser(QWidget):
                 E.write_to_csv(temp, df)
                 counter = counter + 1
             QMessageBox.about(self, "csv export", "csv was exported successfuly")
-        # df = ef.generate_features(self.bag_file)
 
 def get_corrent_file_name(filename, suffix, i = -1):
     if filename == "":
