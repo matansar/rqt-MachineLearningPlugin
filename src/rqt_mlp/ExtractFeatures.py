@@ -22,31 +22,31 @@ def get_specific_features_options():
   
 class ExtractFeatures:
   
-  exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher']
+  exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher', 'attacker', 'attack']
   
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
 
   def __init__(self, topics, window, specific_features_selection = [], general_features_selection = []):
     self.__features_name = []
     self.__window = window
-    self.__topics = topics
+    self.__topics = sorted(list(topics))
     self.set_sepecific_features_selection(specific_features_selection)
     self.set_general_features_selection(general_features_selection)
 
 # ------------------------------------------------------------ setters ------------------------------------------------------------  
 
   def set_sepecific_features_selection(self, specific_features_selection):
-    specific_features_selection = sorted(specific_features_selection)
+    #specific_features_selection = sorted(specific_features_selection)
     if (set(specific_features_selection) <= set(get_specific_features_options())):
-      self.__specific_selection = list(specific_features_selection) # new list 
+      self.__specific_selection = sorted(list(specific_features_selection)) # new list 
     else:
       self.__specific_selection = []
       print('ERROR: the specific features selection is not a subset of specific features options')
     
   def set_general_features_selection(self, general_features_selection):
-    general_features_selection = sorted(general_features_selection)
+    #general_features_selection = sorted(general_features_selection)
     if (set(general_features_selection) <= set(get_general_features_options())):
-      self.__general_selection = list(general_features_selection) # new list 
+      self.__general_selection = sorted(list(general_features_selection)) # new list 
     else:
       self.__general_selection = []
       print('ERROR: the general features selection is not a subset of general features options')
@@ -55,7 +55,7 @@ class ExtractFeatures:
     self.__window = window
     
   def set_topics(self, topics):
-    self.__topics = topics
+    self.__topics = sorted(list(topics))
   
 # ------------------------------------------------------------ functionality -----------------------------------------------------------------  
 
@@ -65,8 +65,9 @@ class ExtractFeatures:
     bag = rosbag.Bag(bag_file)
     stime = bag.get_start_time() # represented by float
     etime = bag.get_end_time()	 # represented by float
+    print("Extract Features on %s (bag file)..." % (bag_file))
     while (stime + self.__window <= etime):
-      print("stime = %s | etime = %s" % (stime , stime + self.__window))
+      #print("stime = %s | etime = %s" % (stime , stime + self.__window))
       features = self.__get_features(bag, stime, stime + self.__window)   
       df = df.append([features])
       stime = stime + self.__window
@@ -328,7 +329,7 @@ class ExtractFeatures:
     if(specific_features_options['threads'] in self.__specific_selection):
       self.__update_features_name("System Threads")
       if len(messages) < 1:
-	ret.append(0)	
+	ret.append(0)
       else:
 	threads = [m.threads for _, m, _ in messages]
 	ret.append(sum(threads))

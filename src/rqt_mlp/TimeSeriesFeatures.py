@@ -8,15 +8,12 @@ options = None
 
 UniFeatures = "Univariate Features"
 MultiFeatures = "Multivariate Features"
-step = 2
 
 class TimeSeries:
-  
-  
 
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
   
-  def __init__(self, input_path, output_path, window, time_series_features_selection):
+  def __init__(self, input_path, output_path, window, time_series_features_selection, step = 2):
     self.__input_path = input_path
     self.__output_path = output_path
     self.__window = window
@@ -32,9 +29,9 @@ class TimeSeries:
   
   def set_univariate_features_selection(self, univariate_features_selection):
     value_index = 1
-    univariate_features_selection = sorted(univariate_features_selection)
+    #univariate_features_selection = sorted(univariate_features_selection)
     if (set(univariate_features_selection) <= set(get_time_series_pre_feature_options()[value_index])):
-      self.__univariate_features_selection = list(univariate_features_selection) # new list 
+      self.__univariate_features_selection = sorted(list(univariate_features_selection)) # new list 
     else:
       self.__univariate_features_selection = []
       print('ERROR: the time series pre feature selection is not a subset of time series features options')
@@ -42,9 +39,9 @@ class TimeSeries:
 
   def set_multivariate_features_selection(self, multivariate_features_selection):
     value_index = 1
-    multivariate_features_selection = sorted(multivariate_features_selection)
+    #multivariate_features_selection = sorted(multivariate_features_selection)
     if (set(multivariate_features_selection) <= set(get_global_time_series_features_options()[value_index])):
-      self.__multivariate_features_selection = list(multivariate_features_selection) # new list 
+      self.__multivariate_features_selection = sorted(list(multivariate_features_selection)) # new list 
     else:
       self.__multivariate_features_selection = []
       print('ERROR: the global time series features selection is not a subset of time series features options')
