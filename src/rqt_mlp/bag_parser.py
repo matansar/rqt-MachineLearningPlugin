@@ -209,17 +209,31 @@ class BagParser(QWidget):
                 item_clicked.selected_list.remove(topic)
                 #if self.item_all.checkState() == Qt.Checked:
                 #    self.item_all.setCheckState(Qt.PartiallyChecked)
-        if self.selected_bag_topics != []:
-            if self.selected_specific_features == [] and self.selected_general_features == []:
-                self.ok_button.setEnabled(False)
-            else:
+
+        if self.selected_specific_features != []:
+            if self.selected_general_features != [] and self.selected_bag_topics != []:
                 self.ok_button.setEnabled(True)
-            # elif self.selected_specific_features != [] and self.selected_general_features == []:
-            #     self.ok_button.setEnabled(True)
-            # elif self.selected_specific_features == [] and self.selected_general_features != []:
-            #     self.ok_button.setEnabled(True)
+            elif self.selected_general_features == [] and self.selected_bag_topics == []:
+                self.ok_button.setEnabled(True)
+            else:
+                self.ok_button.setEnabled(False)
         else:
-            self.ok_button.setEnabled(False)
+            if self.selected_general_features != [] and self.selected_bag_topics != []:
+                self.ok_button.setEnabled(True)
+            else:
+                self.ok_button.setEnabled(False)
+
+        # if self.selected_bag_topics != []:
+        #     if self.selected_specific_features == [] and self.selected_general_features == []:
+        #         self.ok_button.setEnabled(False)
+        #     else:
+        #         self.ok_button.setEnabled(True)
+        #     # elif self.selected_specific_features != [] and self.selected_general_features == []:
+        #     #     self.ok_button.setEnabled(True)
+        #     # elif self.selected_specific_features == [] and self.selected_general_features != []:
+        #     #     self.ok_button.setEnabled(True)
+        # else:
+        #     self.ok_button.setEnabled(False)
 
         # if self.selected_specific_features != []:
         #     if self.selected_bag_topics == [] and self.selected_general_features == []:
