@@ -13,7 +13,7 @@ class TimeSeries:
 
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
   
-  def __init__(self, input_path, output_path, window, time_series_features_selection, step = 2):
+  def __init__(self, input_path, output_path, window, time_series_features_selection, step = 1):
     self.__input_path = input_path
     self.__output_path = output_path
     self.__window = window
@@ -147,7 +147,7 @@ def distance(features_names, dataset):
 # ----------------------------------------------------------------- global variables ------------------------------------------------------------  
 
 
-time_series_per_feature_options = { 'last occurrence' : last , 'first derivative' : df, 'second derivative' : ddf}
+time_series_per_feature_options = { 'average' : statistics.mean, 'last occurrence' : last , 'first derivative' : df, 'second derivative' : ddf}
 global_time_series_features_options = {'passed distance' : distance}
 
 # ----------------------------------------------------------------- getters ------------------------------------------------------------  
