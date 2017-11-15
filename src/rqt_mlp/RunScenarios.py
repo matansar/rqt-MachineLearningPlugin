@@ -92,9 +92,16 @@ def obstacle_source_destination_scenario(scn_obj, source_x, source_y, angle, dis
 def randomaly_obstacle_source_destination_scenario(scn_obj, number_simulations):
     import Randomaly_Obstacle_Source_Dest_Scenario as rosds
     create_restarting_file(scn_obj)
-    #
     rosds.Run_Scenario(scn_obj, number_simulations)
 
+def object_identifying_scenario(scn_obj, source_x, source_y, angle, distance):
+    import Dynamic_Object_Identifying as doi
+    doi.Run_Scenario(scn_obj, source_x, source_y, angle, distance)
+
+def randomly_object_identifying_scenario(scn_obj, number_simulations):
+    import Randomaly_Dynamic_Object_Identifying as rdoi
+    create_restarting_file(scn_obj)
+    rdoi.Run_Scenario(scn_obj, number_simulations)
 
 # ------------------------------------------------
 
@@ -183,20 +190,32 @@ def create_scenarios():
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomaly_source_destionation_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    # scenarios 1 -----------------------------------
+    # scenarios 3 -----------------------------------
     scenario_id = 3
     name = "walking with an obstacle from specific source to specific destination"
     params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND), ('distance', 'greater than 3', 3)]
     function = obstacle_source_destination_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    # scenarios 2 -----------------------------------
+    # scenarios 4 -----------------------------------
     scenario_id = 4
     name = "walking randomly with an obstacle from source to destination"
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomaly_obstacle_source_destination_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 5 -----------------------------------
+    scenario_id = 5
+    name = "object identifying"
+    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than 3', 3)]
+    function = object_identifying_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 6 -----------------------------------
+    scenario_id = 6
+    name = "object identifying randomly"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomly_object_identifying_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
-
+  
 def init_scenarios():
     global scenarios
     tmp_scenarios = create_scenarios()
