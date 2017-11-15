@@ -9,14 +9,15 @@ start_scenarios_time = None
 logging_msg = None
 scenario_deadline = None
 
-def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.world"):
+def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.world", script = ""):
     global start_scenarios_time, logging_msg, scenario_deadline
     source_x, source_y, angle, distance = float(source_x), float(source_y), float(angle), float(distance)
     # ros_launch = "roslaunch robotican_armadillo armadillo.launch lidar:=true move_base:=true " \
     #              "gmapping:=true gazebo:=true gui:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
     start_scenarios_time = rospy.Time.now().to_sec()
     scenario_deadline = calculate_scenario_deadline(distance, world)
-    logging_msg = "source x = %s, source y = %s, angle = %s, distance = %s, world = %s" % (round(source_x,2), round(source_y,2), round(angle,4), round(distance,2), world)
+    logging_msg = "%s\nsource x = %s, source y = %s, angle = %s, distance = %s, world = %s" % (script, round(source_x,2), round(source_y,2), round(angle,4), round(distance,2), world)
+
     ros_launch = "roslaunch robotican_armadillo armadillo.launch lidar:=true move_base:=true " \
                  "gmapping:=true gazebo:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
 
@@ -24,6 +25,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
     time.sleep(7)
+    subprocess.Popen(script, shell=True)
     run_rviz()
     apply_statistics()
     apply_simulation(scen_obj, distance)

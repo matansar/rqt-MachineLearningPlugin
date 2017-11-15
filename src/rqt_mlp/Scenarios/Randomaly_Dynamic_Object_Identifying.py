@@ -2,7 +2,7 @@ import random
 import time
 LOC_BOUND = 2
 DISTANCE_LOWER_BOUND = 3
-DISTANCE_UPPER_BOUND = 7
+DISTANCE_UPPER_BOUND = 5
 waiting_time = 10
 
 def Run_Scenario(scen_obj, number_scenarios):

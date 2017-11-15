@@ -20,9 +20,9 @@
     </physics>
     
     <include>
-      <uri>/home/matansar/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/Extentions/models/box</uri>
+      <uri>/home/lab/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/Extentions/models/box</uri>
       <name>box</name>
-      <pose>3.95647408729 -2.38319470409 -0.34 0 0 0</pose>
+      <pose>4.1 -1.0 -0.34 0 0 0</pose>
     </include>
     <include>
       <uri>model://sun</uri>
