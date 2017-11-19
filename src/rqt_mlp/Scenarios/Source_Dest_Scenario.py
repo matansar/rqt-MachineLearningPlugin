@@ -18,7 +18,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     scenario_deadline = calculate_scenario_deadline(distance, world)
     logging_msg = "%s\nsource x = %s, source y = %s, angle = %s, distance = %s, world = %s" % (script, round(source_x,2), round(source_y,2), round(angle,4), round(distance,2), world)
 
-    ros_launch = "roslaunch robotican_armadillo armadillo.launch lidar:=true move_base:=true " \
+    ros_launch = "roslaunch robotican_armadillo armadillo.launch kinect2:=true lidar:=true move_base:=true " \
                  "gmapping:=true gazebo:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % world
 
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
