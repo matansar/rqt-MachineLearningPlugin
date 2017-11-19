@@ -30,6 +30,5 @@
 /joy_vel
 /collision_object
 /attached_collision_object
-/map
 /map_metadata
 /map_updates
