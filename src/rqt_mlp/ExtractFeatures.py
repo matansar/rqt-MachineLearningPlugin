@@ -99,6 +99,9 @@ class ExtractFeatures:
       #if(general_features_options['min_consecutive'] in self.__general_selection):
       #  min_consecutive_messages = self.__min_consecutive_time_messages(topic, messages)
       #  ret.append(min_consecutive_messages)
+      if(general_features_options['traffic'] in self.__general_selection):
+	traffic = self.__get_my_traffic(topic, messages)
+	ret.append(traffic)
       if(general_features_options['max_consecutive'] in self.__general_selection):
 	max_consecutive_messages = self.__max_consecutive_time_messages(topic, messages)
 	ret.append(max_consecutive_messages)   
@@ -111,9 +114,19 @@ class ExtractFeatures:
       if(general_features_options['age'] in self.__general_selection):
 	age_messages = self.__age_messages(topic, messages)
 	ret.append(age_messages)
-	
-    
     return ret
+
+  def __get_bytes_size(self, data):
+    import StringIO
+    buff = StringIO.StringIO()
+    data.serialize(buff)
+    return len(buff.getvalue())
+  
+  def __get_my_traffic(self, topic, topic_messages):
+    self.__update_features_name("%s My_Traffic(Bytes)" % topic)
+    traffics = [self.__get_bytes_size(m) for _, m, _ in topic_messages]
+    return sum(traffics)
+
 
   # Host_statistics - return the features in the same calling's order
   def __get_features_host_statistics(self, bag, stime, etime):
@@ -150,9 +163,9 @@ class ExtractFeatures:
       if(general_features_options['delivered'] in self.__general_selection):
 	delivered_msgs = self.__get_delivered_msgs(topic, topic_messages)
 	topic_statistics.append(delivered_msgs)
-      if(general_features_options['traffic'] in self.__general_selection):
-	traffic = self.__get_traffic(topic, topic_messages)
-	topic_statistics.append(traffic)
+      #if(general_features_options['traffic'] in self.__general_selection):
+	#traffic = self.__get_traffic(topic, topic_messages)
+	#topic_statistics.append(traffic)
       #max_mean_std_period = self.__get_max_mean_std_period(topic, topic_messages)
       #max_mean_std_age = self.__get_max_mean_std_age(topic, topic_messages)
     return topic_statistics
