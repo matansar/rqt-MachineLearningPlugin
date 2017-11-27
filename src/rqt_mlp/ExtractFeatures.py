@@ -23,6 +23,7 @@ def get_specific_features_options():
 class ExtractFeatures:
   
   exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher', 'attacker', 'attack']
+  include_nodes = ['/slam_gmapping', '/twist_mux', '/robot_state_publisher']
   
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
 
@@ -225,7 +226,7 @@ class ExtractFeatures:
     return consecutive_times
   
   def __get_relevant_nodes(self, messages):
-    messages = filter(lambda (n,m,t): self.__is_include_nodes(m.node), messages) #related just to relevant nodes
+    messages = filter(lambda (n,m,t): m.node in include_nodes, messages) #related just to relevant nodes
     ret = []
     nodes = []
     for message in reversed(messages):

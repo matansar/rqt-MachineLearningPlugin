@@ -35,6 +35,11 @@ def run_rviz():
     rviz = "rosrun rviz rviz -d /home/lab/dwa.rviz"
     subprocess.Popen(rviz, shell=True)
 
+def apply_diagnostic():
+    ros_profiler = "rosrun rosdiagnostic rosdiagnostic"
+    subprocess.Popen(ros_profiler, shell=True)
+    pass
+    
 def apply_statistics():
     enable_statistics = "rosparam set enable_statistics true"
     ros_profiler = "rosrun rosprofiler rosprofiler"
