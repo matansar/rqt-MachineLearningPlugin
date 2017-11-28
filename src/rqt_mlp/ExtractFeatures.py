@@ -25,7 +25,7 @@ class ExtractFeatures:
     #include_nodes = ['/rosout']
   exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher', 'attacker', 'attack']
   include_nodes = ['/slam_gmapping', '/twist_mux', '/robot_state_publisher']
-  include_hosts = ['msatansar']
+  include_hosts = ['matansar']
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
 
   def __init__(self, topics, window, specific_features_selection = [], general_features_selection = []):

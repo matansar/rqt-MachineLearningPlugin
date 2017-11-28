@@ -16,7 +16,8 @@ class RunScenario:
 
     # selected_scenario = {id = "", params = {x: value_x}}
     def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics):
-        must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
+	must_topics = ['/host_diagnostic', '/node_diagnostic', '/statistics', "/move_base/feedback"]
+        #must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
         self.__restart_flag = False
         self.__bag_obj = bag_obj
         self.__export_bag = export_bag
