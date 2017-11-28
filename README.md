@@ -23,16 +23,15 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
          ```{r, engine='sh', count_lines}
       sudo pip install statistics
       ```
-
+      
+ * Install rosdiagnostic package: https://github.com/matansar/rosDiagnostic.git
+ 
  * Download or clone this project using terminal/bash:
     ```{r, engine='sh', count_lines}
     cd ~/catkin_ws/src/
     git clone https://github.com/matansar/rqt_mlp.git
     ```
- * Install rosprofiler package:
-    ```{r, engine='sh', count_lines}
-    sudo apt-get install ros-indigo-rosprofiler
-    ```
+ 
  * Run the setup.sh file and compile:
    ```{r, engine='sh', count_lines}
    cd ~/catkin_ws/src/rqt_mlp/install/
