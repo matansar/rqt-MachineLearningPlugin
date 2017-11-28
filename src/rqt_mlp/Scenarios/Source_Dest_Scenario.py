@@ -27,7 +27,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     time.sleep(7)
     subprocess.Popen(script, shell=True)
     run_rviz()
-    apply_statistics()
+    apply_diagnostic()
     apply_simulation(scen_obj, distance)
     scen_obj.generate_bag()
 

@@ -12,7 +12,7 @@ general_features_options = dict(counter = '# of messages', max_consecutive = 'co
 
 # min_consecutive = 'mininum time between consecutive messages', 
 
-specific_features_options = dict(location_x = 'location x', location_y = 'location y', vel_linear_x = 'velocity linear x', vel_angular_z = 'velocity angular z', threads = '# of system\'s threads', max_cpu_node = 'CPU maximun load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes', cpu_host = 'CPU host load infomation', mem_host = 'memory host information (aviability & usage)')
+specific_features_options = dict(location_x = 'location x', location_y = 'location y', vel_linear_x = 'velocity linear x', vel_angular_z = 'velocity angular z', threads = '# of nodes\' threads', max_cpu_node = 'CPU maximun load by nodes', min_cpu_node = 'CPU minimum load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes',min_virt_mem = 'minimun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes',min_real_mem = 'minimum real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes', cpu_host = 'CPU host load infomation', mem_host = 'memory host information (aviability & usage)')
 
 def get_general_features_options():
   return general_features_options.values()
@@ -22,9 +22,10 @@ def get_specific_features_options():
   
 class ExtractFeatures:
   
+    #include_nodes = ['/rosout']
   exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher', 'attacker', 'attack']
   include_nodes = ['/slam_gmapping', '/twist_mux', '/robot_state_publisher']
-  
+  include_hosts = ['msatansar']
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
 
   def __init__(self, topics, window, specific_features_selection = [], general_features_selection = []):
@@ -84,10 +85,10 @@ class ExtractFeatures:
     general_features = self.__get_general_features(bag, stime, etime)
     nav_vel_features = self.__get_features_nav_vel(bag, stime, etime)
     mb_feedback_features = self.__get_features_move_bsae_feedback(bag, stime, etime)
-    node_statistics_features = self.__get_features_node_statistics(bag, stime, etime)
-    host_statistics_features = self.__get_features_host_statistics(bag, stime, etime)
+    node_diagnostic_features = self.__get_features_node_diagnostic(bag, stime, etime)
+    host_diagnostic_features = self.__get_features_host_diagnostic(bag, stime, etime)
     statistics_features = self.__get_features_statistics(bag, stime, etime)
-    return general_features + nav_vel_features + mb_feedback_features + node_statistics_features + host_statistics_features + statistics_features
+    return general_features + nav_vel_features + mb_feedback_features + node_diagnostic_features + host_diagnostic_features + statistics_features
         
   # General type - return the features in the same calling's order
   def __get_general_features(self, bag, stime, etime):
@@ -129,26 +130,39 @@ class ExtractFeatures:
     return sum(traffics)
 
 
-  # Host_statistics - return the features in the same calling's order
-  def __get_features_host_statistics(self, bag, stime, etime):
-    topic = '/host_statistics'
+  # Host_diagnostic - return the features in the same calling's order
+  def __get_features_host_diagnostic(self, bag, stime, etime):
+    topic = '/host_diagnostic'
+    ret = []
     messages = list(bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics = [topic]))
-    cpu_max_mean_std = self.__get_hosts_max_mean_std_cpu_load(messages)
-    mem_max_mean_std = self.__get_hosts_mem_avail_use(messages)
-    return cpu_max_mean_std + mem_max_mean_std
+    hosts_messages = self.__get_map_hosts_messages(messages)
+    for host_name in self.include_hosts:
+      host_messages = hosts_messages[host_name]
+      cpu_max_mean_std = self.__get_hosts_max_mean_std_cpu_load(host_name, host_messages)
+      mem_max_mean_std = self.__get_hosts_mem_avail_use(host_name, host_messages)
+      ret.extend(cpu_max_mean_std)
+      ret.extend(mem_max_mean_std)
+    return ret
 
-  # Node_statistics - return the features in the same calling's order
-  def __get_features_node_statistics(self, bag, stime, etime):
-    topic = '/node_statistics'
+  # Node_diagnostic - return the features in the same calling's order
+  def __get_features_node_diagnostic(self, bag, stime, etime):
+    topic = '/node_diagnostic'
+    ret = []
     messages = list(bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics = [topic]))
-    messages = self.__get_relevant_nodes(messages)
-    threads_counter = self.__get_nodes_count_threads(messages)
-    max_mean_std_cpu_load = self.__get_nodes_max_mean_std_cpu_load(messages)
-    max_mean_std_virt_mem = self.__get_nodes_max_mean_std_virt_mem(messages)
-    max_mean_std_real_mem = self.__get_nodes_max_mean_std_real_mem(messages) 
-    return  threads_counter + max_mean_std_cpu_load + max_mean_std_virt_mem + max_mean_std_real_mem
+    nodes_messages = self.__get_map_nodes_messages(messages)
+    for node in self.include_nodes:
+      messages = nodes_messages[node]
+      threads_counter = self.__get_nodes_count_threads(node, messages)
+      max_mean_std_cpu_load = self.__get_nodes_max_mean_std_cpu_load(node, messages)
+      max_mean_std_virt_mem = self.__get_nodes_max_mean_std_virt_mem(node, messages)
+      max_mean_std_real_mem = self.__get_nodes_max_mean_std_real_mem(node, messages)
+      ret.extend(threads_counter)
+      ret.extend(max_mean_std_cpu_load)
+      ret.extend(max_mean_std_virt_mem)
+      ret.extend(max_mean_std_real_mem)
+    return ret
     
-  # Statistics - return the features in the same calling's order  
+  # statistics - return the features in the same calling's order  
   def __get_features_statistics(self, bag, stime, etime):
     topic = '/statistics'
     messages = list(bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics = [topic]))
@@ -225,18 +239,29 @@ class ExtractFeatures:
 	consecutive_times.append(t2-t1)
     return consecutive_times
   
-  def __get_relevant_nodes(self, messages):
-    messages = filter(lambda (n,m,t): m.node in include_nodes, messages) #related just to relevant nodes
-    ret = []
-    nodes = []
-    for message in reversed(messages):
-      (topic , m, t) = message
-      node = m.node
-      if node not in nodes:
-	ret.append(message)
-	nodes.append(node)
-    return ret    
-
+  def __get_map_hosts_messages(self, messages):
+    messages = filter(lambda (n,m,t): m.hostname in self.include_hosts, messages) #related just to relevant hosts
+    ret = {}
+    #initilize hosts in the map
+    for host in self.include_hosts:
+      ret[host] = []
+    #get msgs of each host
+    for msg in messages:
+      (topic , m, t) = msg
+      ret[m.hostname].append(msg)
+    return ret
+  
+  def __get_map_nodes_messages(self, messages):
+    messages = filter(lambda (n,m,t): m.node in self.include_nodes, messages) #related just to relevant nodes
+    ret = {}
+    #initilize nodes in the map
+    for node in self.include_nodes:
+      ret[node] = []
+    #get msgs of each node
+    for msg in messages:
+      (topic , m, t) = msg
+      ret[m.node].append(msg)
+    return ret
 # -------------------------------------------- features type 0 -------------------------------------------------------------------
 
   #feature 1
@@ -338,69 +363,76 @@ class ExtractFeatures:
 # -------------------------------------------- features type 3 -------------------------------------------------------------------
 
   #feature 30
-  def __get_nodes_count_threads(self, messages):
+  def __get_nodes_count_threads(self, node, messages):
+    import statistics as stat
     ret = []
     if(specific_features_options['threads'] in self.__specific_selection):
-      self.__update_features_name("System Threads")
+      self.__update_features_name("Threads(%s)" % node)
       if len(messages) < 1:
 	ret.append(0)
       else:
 	threads = [m.threads for _, m, _ in messages]
-	ret.append(sum(threads))
+	ret.append(stat.mean(threads))
     return ret 
 
   #feature 31
-  def __get_nodes_max_mean_std_cpu_load(self, messages):
+  def __get_nodes_max_mean_std_cpu_load(self, node, messages):
     import statistics as stat
+    import sys
+    cpu_loads = reduce(lambda acc,m: acc + list(m[1].cpu_loads), messages, [])
     ret = []
     if(specific_features_options['max_cpu_node'] in self.__specific_selection):
-      self.__update_features_name("Nodes Max CPU")
-      cpu_maxs = [m.cpu_load_max for _, m, _ in messages]
-      ret.append(max([0] + cpu_maxs))
+      self.__update_features_name("MaxLoadCPU(%s)" % node)
+      ret.append(max([0] + cpu_loads))
+    if(specific_features_options['min_cpu_node'] in self.__specific_selection):
+      self.__update_features_name("MinLoadCPU(%s)" % node)
+      ret.append(min([sys.maxint] + cpu_loads))
     if(specific_features_options['mean_cpu_node'] in self.__specific_selection):
-      self.__update_features_name("Nodes Mean CPU")
-      cpu_means = [m.cpu_load_mean for _, m, _ in messages]
-      ret.append(stat.mean(cpu_means)) if len(cpu_means) > 0 else ret.append(0)
+      self.__update_features_name("MeanLoadCPU(%s)" % node)
+      ret.append(stat.mean(cpu_loads)) if len(cpu_loads) > 0 else ret.append(0)
     if(specific_features_options['std_cpu_node'] in self.__specific_selection):
-      self.__update_features_name("Nodes Std CPU")
-      cpu_stds = [m.cpu_load_std for _, m, _ in messages]    
-      ret.append(stat.mean(cpu_stds)) if len(cpu_stds) > 0 else ret.append(0)
+      self.__update_features_name("StdLoadCPU(%s)" % node)
+      ret.append(stat.stdev(cpu_loads)) if len(cpu_loads) > 1 else ret.append(sys.maxint)
     return ret
   
   #feature 32
-  def __get_nodes_max_mean_std_virt_mem(self, messages):
+  def __get_nodes_max_mean_std_virt_mem(self, node, messages):
     import statistics as stat
+    import sys
+    virt_mems = reduce(lambda acc,m: acc + list(m[1].virt_mems), messages, [])
     ret = []
     if(specific_features_options['max_virt_mem'] in self.__specific_selection):
-      self.__update_features_name("Nodes Max Virt-mem")
-      virl_mem_maxs = [m.virt_mem_max for _, m, _ in messages]
-      ret.append(max([0] + virl_mem_maxs))
+      self.__update_features_name("MaxVirtMem(%s)" % node)      
+      ret.append(max([0] + virt_mems))
+    if(specific_features_options['min_virt_mem'] in self.__specific_selection):
+      self.__update_features_name("MinVirtMem(%s)" % node)      
+      ret.append(min([[sys.maxint]] + virt_mems))
     if(specific_features_options['mean_virt_mem'] in self.__specific_selection):
-      self.__update_features_name("Nodes Mean Virt-mem")
-      virl_mem_means = [m.virt_mem_mean for _, m, _ in messages]
-      ret.append(stat.mean(virl_mem_means)) if len(virl_mem_means) > 0 else ret.append(0)
+      self.__update_features_name("MeanVirtMem(%s)" % node)
+      ret.append(stat.mean(virt_mems)) if len(virt_mems) > 0 else ret.append(0)
     if(specific_features_options['std_virt_mem'] in self.__specific_selection):
-      self.__update_features_name("Nodes Std Virt-mem")
-      virl_mem_stds = [m.virt_mem_std for _, m, _ in messages]
-      ret.append(stat.mean(virl_mem_stds)) if len(virl_mem_stds) > 0 else ret.append(0)   
+      self.__update_features_name("StdVirtMem(%s)" % node)
+      ret.append(stat.stdev(virt_mems)) if len(virt_mems) > 1 else ret.append([sys.maxint])   
     return ret
 
   #feature 33
-  def __get_nodes_max_mean_std_real_mem(self, messages):
+  def __get_nodes_max_mean_std_real_mem(self, node, messages):
     import statistics as stat
+    import sys
+    real_mems = reduce(lambda acc,m: acc + list(m[1].real_mems), messages, [])
     ret = []
     if(specific_features_options['max_real_mem'] in self.__specific_selection):
-      self.__update_features_name("Nodes Max Real-mem")
-      real_mem_maxs = [m.real_mem_max for _, m, _ in messages]
-      ret.append(max([0] + real_mem_maxs))
+      self.__update_features_name("MaxRealMem(%s)" % node)
+      ret.append(max([0] + real_mems))
+    if(specific_features_options['max_real_mem'] in self.__specific_selection):
+      self.__update_features_name("MinRealMem(%s)" % node)
+      ret.append(min([sys.maxint] + real_mems))
     if(specific_features_options['mean_real_mem'] in self.__specific_selection):
-      self.__update_features_name("Nodes Mean Real-mem")
-      real_mem_means = [m.real_mem_mean for _, m, _ in messages]
-      ret.append(stat.mean(real_mem_means)) if len(real_mem_means) > 0 else ret.append(0)
+      self.__update_features_name("MeanRealMem(%s)" % node)
+      ret.append(stat.mean(real_mems)) if len(real_mems) > 0 else ret.append(0)
     if(specific_features_options['std_real_mem'] in self.__specific_selection):
-      self.__update_features_name("Nodes Std Real-mem")
-      real_mem_stds = [m.real_mem_std for _, m, _ in messages]
-      ret.append(stat.mean(real_mem_stds)) if len(real_mem_stds) > 0 else ret.append(0)
+      self.__update_features_name("StdRealMem(%s)" % node)
+      ret.append(stat.stdev(real_mems)) if len(real_mems) > 1 else ret.append(sys.maxint)
     return ret
 
 
@@ -408,35 +440,73 @@ class ExtractFeatures:
 
 
   #feature 40
-  def __get_hosts_max_mean_std_cpu_load(self, messages):
+  def __get_hosts_max_mean_std_cpu_load(self, host_name, messages):
     import statistics as stat
+    import sys, multiprocessing
+    features = ["Max", "Min", "Mean", "Std"]
     ret = []
+    if len(messages) > 0:
+      _, m, _ = messages[0]
+      cpus = len(m.cpu_load)
+    else:
+      cpus = multiprocessing.cpu_count()
     if(specific_features_options['cpu_host'] in self.__specific_selection):
-      for opt in ["Max", "Mean", "Std"]:
-	    self.__update_features_name("%s CPU" % (opt,))
+      for cpu_id in range(0,cpus):
+	for opt in features:
+	      self.__update_features_name("%s(%sCPU%s)" % (host_name, opt,cpu_id))
       if len(messages) < 1:
-	ret = self.__default_values(0,3)
+	ret = self.__default_values(0, len(features) * cpus)
+	# defult for stdev
+	jumping = 4
+	for i in range(3,len(features) * cpus, jumping): 
+	  ret[i] = sys.maxint
+	# defult for min
+	for i in range(1,len(features) * cpus, jumping): 
+	  ret[i] = sys.maxint  
       else:
-	_, m, _ = messages[-1]
-	cpu_max = max(list(m.cpu_load_max))
-	cpu_mean = stat.mean(list(m.cpu_load_mean))
-	cpu_std = stat.mean(list(m.cpu_load_std))
-	ret = [cpu_max, cpu_mean, cpu_std]
+	for cpu_id in range(0,cpus):
+	    #need to converte from tuple to list
+	    cpu_loads = reduce(lambda acc,m: acc + list(m[1].cpu_load[cpu_id].cpu_load), messages, [])
+	    cpu_max = max(cpu_loads + [0])
+	    cpu_min = min(cpu_loads +[sys.maxint])
+	    cpu_mean = stat.mean(cpu_loads) if len(cpu_loads) > 0 else 0
+	    cpu_std = stat.stdev(cpu_loads) if len(cpu_loads) > 1 else sys.maxint
+	    ret.extend([cpu_max, cpu_min, cpu_mean, cpu_std])
     return ret
   
   #feature 41
-  
-  def __get_hosts_mem_avail_use(self, messages):
+  def __get_hosts_mem_avail_use(self, host_name, messages):
+    import statistics as stat
+    import sys
     ret = []
     if(specific_features_options['mem_host'] in self.__specific_selection):
-      self.__update_features_name("Hosts Max Use-mem", "Hosts Mean Use-mem", "Hosts Std Use-mem", "Hosts Max Avail-mem", "Hosts Mean Avail-mem", "Hosts Std Avail-mem")
+      self.__update_features_name(
+	"HostMaxUseMem(%s)" % host_name, "HostMinUseMem(%s)" % host_name, "HostMeanUseMem(%s)" % host_name, "HostStdUseMem(%s)" % host_name,
+	"HostMaxAvailMem(%s)" % host_name, "HostMinAvailMem(%s)" % host_name, "HostMeanAvailMem(%s)" % host_name, "HostStdAvailMem(%s)" % host_name)
       if len(messages) < 1:
-	ret.extend(self.__default_values(0,3)) 	#for usage memory
-	ret.extend(self.__default_values(-1,2))	#for avail memory (max and mean)
-	ret.extend(self.__default_values(0,1))	#for avail memory (std)
+	#usage
+	ret.append(0)		# max
+	ret.append(0)		# min
+	ret.append(0)		# mean
+	ret.append(0)		# stdev
+	#available
+	ret.append(sys.maxint)  # max
+	ret.append(sys.maxint)	# min
+	ret.append(sys.maxint)  # mean
+	ret.append(0)		# stdev (all are max int)
       else:
-	_, m, _ = messages[-1]
-	ret = [m.phymem_used_max, m.phymem_used_mean, m.phymem_used_std, m.phymem_avail_max, m.phymem_avail_mean, m.phymem_avail_std]
+	phymem_useds = reduce(lambda acc,m: acc + list(m[1].phymem_used), messages, [])
+	phymem_avails = reduce(lambda acc,m: acc + list(m[1].phymem_avail), messages, [])
+	#usage
+	ret.append(max(phymem_useds + [0]))		# max
+	ret.append(min(phymem_useds + [sys.maxint]))	# min
+	ret.append(stat.mean(phymem_useds) if len(phymem_useds) > 0 else 0)		# mean
+	ret.append(stat.stdev(phymem_useds)if len(phymem_useds) > 1 else sys.maxint)	# stdev
+	#available
+	ret.append(max(phymem_avails + [0]))		# max
+	ret.append(min(phymem_avails + [sys.maxint]))	# min
+	ret.append(stat.mean(phymem_avails) if len(phymem_avails) > 0 else 0)		# mean
+	ret.append(stat.stdev(phymem_avails)if len(phymem_avails) > 1 else sys.maxint)	# stdev
     return ret 
   
 
@@ -514,13 +584,205 @@ def ApplyOptions():
     if not options.output:
 	parser.error('OUT file is not given')
 
+def print_bag(bag_file, path_file,window):
+  bag = rosbag.Bag(bag_file)
+  
+  stime = bag.get_start_time() + 0	# represented by float
+  etime = stime + window 	# represented by float
+  with open(path_file, "w") as f:
+    for msg in bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime)):
+      f.write("time: " + str(msg[2]) + "\n")
+      f.write(str(msg[1]) + "\n\n\n\n")
+  
+
 
 
 if __name__ == '__main__':
   ApplyOptions()
-  topics = ['/cmd_vel']
+  dic = dict(threads = '# of nodes\' threads', max_cpu_node = 'CPU maximun load by nodes', min_cpu_node = 'CPU minimum load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes',min_virt_mem = 'minimun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes',min_real_mem = 'minimum real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes')
+  bag_path = "bags/diagnostic.bag"
+  output_path = "bags/diagnostic.csv"
+  path_file = "bags/diagnostic.info"
+  topics = ['/host_diagnostic']
   window = 1
-  ef = ExtractFeatures(topics, window, general_features_selection = [], specific_features_selection = ['location x', 'location y'])
-  df = ef.generate_features(options.bag_file)
-  write_to_csv(options.output, df)
+  general_features_selection = []
+  #specific_features_selection  = dic.values()
+  specific_features_selection = ['CPU host load infomation']
+  ef = ExtractFeatures(topics, window, specific_features_selection, general_features_selection)
+  df = ef.generate_features(bag_path)
+  write_to_csv(output_path, df)
+  print_bag(bag_path, path_file,window)
   
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+## --------------------------------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------------------------------------
+## ---------------------------------------------------- dont use ------------------------------------------------------------------------------
+ 
+
+  def __tmp(self):
+    def __get_features_host_statistics(self, bag, stime, etime):
+      topic = '/host_statistics'
+      messages = list(bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics = [topic]))
+      cpu_max_mean_std = self.__get_hosts_max_mean_std_cpu_load(messages)
+      mem_max_mean_std = self.__get_hosts_mem_avail_use(messages)
+      return cpu_max_mean_std + mem_max_mean_std
+
+    # Node_statistics - return the features in the same calling's order
+    def __get_features_node_statistics(self, bag, stime, etime):
+      topic = '/node_statistics'
+      messages = list(bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics = [topic]))
+      messages = self.__get_relevant_nodes(messages)
+      threads_counter = self.__get_nodes_count_threads(messages)
+      max_mean_std_cpu_load = self.__get_nodes_max_mean_std_cpu_load(messages)
+      max_mean_std_virt_mem = self.__get_nodes_max_mean_std_virt_mem(messages)
+      max_mean_std_real_mem = self.__get_nodes_max_mean_std_real_mem(messages) 
+      return  threads_counter + max_mean_std_cpu_load + max_mean_std_virt_mem + max_mean_std_real_mem
+    
+    def __get_relevant_nodes(self, messages):
+      messages = filter(lambda (n,m,t): m.node in self.include_nodes, messages) #related just to relevant nodes
+      ret = []
+      nodes = []
+      for message in reversed(messages):
+	(topic , m, t) = message
+	node = m.node
+	if node not in nodes:
+	  ret.append(message)
+	  nodes.append(node)
+      return ret    
+    
+    ##feature 30
+    def __get_nodes_count_threads(self, messages):
+      ret = []
+      if(specific_features_options['threads'] in self.__specific_selection):
+	self.__update_features_name("System Threads")
+	if len(messages) < 1:
+	  ret.append(0)
+	else:
+	  threads = [m.threads for _, m, _ in messages]
+	  ret.append(sum(threads))
+      return ret 
+
+    #feature 31
+    def __get_nodes_max_mean_std_cpu_load(self, messages):
+      import statistics as stat
+      ret = []
+      if(specific_features_options['max_cpu_node'] in self.__specific_selection):
+	self.__update_features_name("Nodes Max CPU")
+	cpu_maxs = [m.cpu_load_max for _, m, _ in messages]
+	ret.append(max([0] + cpu_maxs))
+      if(specific_features_options['mean_cpu_node'] in self.__specific_selection):
+	self.__update_features_name("Nodes Mean CPU")
+	cpu_means = [m.cpu_load_mean for _, m, _ in messages]
+	ret.append(stat.mean(cpu_means)) if len(cpu_means) > 0 else ret.append(0)
+      if(specific_features_options['std_cpu_node'] in self.__specific_selection):
+	self.__update_features_name("Nodes Std CPU")
+	cpu_stds = [m.cpu_load_std for _, m, _ in messages]    
+	ret.append(stat.mean(cpu_stds)) if len(cpu_stds) > 0 else ret.append(0)
+      return ret
+    
+    #feature 32
+    def __get_nodes_max_mean_std_virt_mem(self, messages):
+      import statistics as stat
+      ret = []
+      if(specific_features_options['max_virt_mem'] in self.__specific_selection):
+	self.__update_features_name("Nodes Max Virt-mem")
+	virl_mem_maxs = [m.virt_mem_max for _, m, _ in messages]
+	ret.append(max([0] + virl_mem_maxs))
+      if(specific_features_options['mean_virt_mem'] in self.__specific_selection):
+	self.__update_features_name("Nodes Mean Virt-mem")
+	virl_mem_means = [m.virt_mem_mean for _, m, _ in messages]
+	ret.append(stat.mean(virl_mem_means)) if len(virl_mem_means) > 0 else ret.append(0)
+      if(specific_features_options['std_virt_mem'] in self.__specific_selection):
+	self.__update_features_name("Nodes Std Virt-mem")
+	virl_mem_stds = [m.virt_mem_std for _, m, _ in messages]
+	ret.append(stat.mean(virl_mem_stds)) if len(virl_mem_stds) > 0 else ret.append(0)   
+      return ret
+
+    #feature 33
+    def __get_nodes_max_mean_std_real_mem(self, messages):
+      import statistics as stat
+      ret = []
+      if(specific_features_options['max_real_mem'] in self.__specific_selection):
+	self.__update_features_name("Nodes Max Real-mem")
+	real_mem_maxs = [m.real_mem_max for _, m, _ in messages]
+	ret.append(max([0] + real_mem_maxs))
+      if(specific_features_options['mean_real_mem'] in self.__specific_selection):
+	self.__update_features_name("Nodes Mean Real-mem")
+	real_mem_means = [m.real_mem_mean for _, m, _ in messages]
+	ret.append(stat.mean(real_mem_means)) if len(real_mem_means) > 0 else ret.append(0)
+      if(specific_features_options['std_real_mem'] in self.__specific_selection):
+	self.__update_features_name("Nodes Std Real-mem")
+	real_mem_stds = [m.real_mem_std for _, m, _ in messages]
+	ret.append(stat.mean(real_mem_stds)) if len(real_mem_stds) > 0 else ret.append(0)
+      return ret
+      
+      
+	#feature 40
+    def __get_hosts_max_mean_std_cpu_load(self, messages):
+      import statistics as stat
+      ret = []
+      if(specific_features_options['cpu_host'] in self.__specific_selection):
+	for opt in ["Max", "Mean", "Std"]:
+	      self.__update_features_name("%s CPU" % (opt,))
+	if len(messages) < 1:
+	  ret = self.__default_values(0,3)
+	else:
+	  _, m, _ = messages[-1]
+	  cpu_max = max(list(m.cpu_load_max))
+	  cpu_mean = stat.mean(list(m.cpu_load_mean))
+	  cpu_std = stat.mean(list(m.cpu_load_std))
+	  ret = [cpu_max, cpu_mean, cpu_std]
+      return ret
+
+    #feature 41
+
+    def __get_hosts_mem_avail_use(self, messages):
+      ret = []
+      if(specific_features_options['mem_host'] in self.__specific_selection):
+	self.__update_features_name("Hosts Max Use-mem", "Hosts Mean Use-mem", "Hosts Std Use-mem", "Hosts Max Avail-mem", "Hosts Mean Avail-mem", "Hosts Std Avail-mem")
+	if len(messages) < 1:
+	  ret.extend(self.__default_values(0,3)) 	#for usage memory
+	  ret.extend(self.__default_values(-1,2))	#for avail memory (max and mean)
+	  ret.extend(self.__default_values(0,1))	#for avail memory (std)
+	else:
+	  _, m, _ = messages[-1]
+	  ret = [m.phymem_used_max, m.phymem_used_mean, m.phymem_used_std, m.phymem_avail_max, m.phymem_avail_mean, m.phymem_avail_std]
+      return ret 
+
