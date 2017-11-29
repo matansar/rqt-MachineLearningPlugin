@@ -21,6 +21,8 @@ class HistorySelection(QWidget):
         self.history_items[per_title] = pre
         self.history_items[glob_title] = glob
 
+        self._to_save_filename = []
+
         print self.history_items
 
         self.group_selected_items = dict()
@@ -99,6 +101,12 @@ class HistorySelection(QWidget):
         self.label5 = QLabel("Duration Time:", self)
         self.label5.setAlignment(Qt.AlignCenter)
 
+        self.label6 = QLabel("Step:", self)
+        self.label6.setAlignment(Qt.AlignCenter)
+
+        self.step = QLineEdit(self)
+        self.step.setText("1")
+
         self.windows_time_3 = QHBoxLayout(self)
 
         self.windows_time_3.addWidget(self.label4)
@@ -108,6 +116,15 @@ class HistorySelection(QWidget):
         self.windows_time_3.addWidget(self.label5)
 
         self.main_vlayout.addLayout(self.windows_time_3)
+
+        self.step_2 = QHBoxLayout(self)
+
+        self.step_2.addWidget(self.label6)
+
+        self.step_2.addWidget(self.step)
+
+        self.main_vlayout.addLayout(self.step_2)
+
 
         # self.main_vlayout.addRow(self.label4, self.window)
 
@@ -248,9 +265,10 @@ class HistorySelection(QWidget):
 
     def check_int(self, number, condition, title, message_body):
         try:
+            print type(number)
             val = int(number)
-            if val < condition:
-                QMessageBox.about(self, title, "The number should >= %s" % condition)
+            if val <= condition:
+                QMessageBox.about(self, title, "The number should > %s" % condition)
                 return False
         except ValueError:
             QMessageBox.about(self, title, message_body)
@@ -279,10 +297,11 @@ class HistorySelection(QWidget):
     def check_validation(self):
         flag = self.check_files_amount()
         flag = flag & self.check_choose()
-        flag = flag & self.check_int(self.window.text(), 3, "Error in Window Time", "That's not a number!")
+        flag = flag & self.check_int(self.window.text(), 2, "Error in Window Time", "That's not a number!")
+        flag = flag & self.check_int(self.step.text(), 0, "Error in Step", "That's not a integer!")
         # TODO selected topic not empty
 
-        if self._to_save_filename[0] == '':
+        if self._to_save_filename == []:
             QMessageBox.about(self, "Save CSV", "Select path for saving")
             flag = False
         return flag
@@ -303,7 +322,7 @@ class HistorySelection(QWidget):
             for topic in topics:
                 f.write(topic + "\n")
         self.createTimeSeriesFeatures(self.files, self._to_save_filename, int(self.window.text()),
-                                      self.group_selected_items)
+                                      self.group_selected_items, int(self.step.text()))
 
     def onSaveClicked(self):
         import inspect, os
@@ -315,7 +334,6 @@ class HistorySelection(QWidget):
         print self.group_selected_items
         current_directory = self.get_current_opened_directory(filepath)
         print current_directory
-        self._to_save_filename = []
         self._to_save_filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory,
                                                              self.tr('csv (*.csv)'))
         if self._to_save_filename[0] != "":
@@ -328,7 +346,7 @@ class HistorySelection(QWidget):
                 # logger_topic.info()
         self.save_path.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
 
-    def createTimeSeriesFeatures(self, files, to_save_filename, window, group_selected_items):
+    def createTimeSeriesFeatures(self, files, to_save_filename, window, group_selected_items, step):
         import TimeSeriesFeatures as TS
         to_save_filename = to_save_filename[0].encode('utf-8')
         for i in range(0, len(files)):
@@ -337,6 +355,7 @@ class HistorySelection(QWidget):
             input_path = files[i]
             output_path = get_corrent_file_name(to_save_filename, ".csv", i)
             print "in = %s out = %s " % (input_path, output_path)
+            # step
             ts = TS.TimeSeries(input_path, output_path, window, group_selected_items)
             ts.generate_time_series_features()
             if len(files) == 1:
