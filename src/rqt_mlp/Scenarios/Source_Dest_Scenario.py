@@ -5,6 +5,8 @@ import rospy
 from move_base_msgs.msg import MoveBaseActionResult
 from move_base_msgs.msg import MoveBaseActionFeedback
 
+
+SLEEPING_TIME = 15 ### related to computer's force
 start_scenarios_time = None
 logging_msg = None
 scenario_deadline = None
@@ -24,9 +26,9 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
-    time.sleep(7)
+    time.sleep(SLEEPING_TIME)
     subprocess.Popen(script, shell=True)
-    run_rviz()
+    #run_rviz()
     apply_diagnostic()
     apply_simulation(scen_obj, distance)
     scen_obj.generate_bag()

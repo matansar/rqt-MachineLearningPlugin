@@ -355,8 +355,8 @@ class HistorySelection(QWidget):
             input_path = files[i]
             output_path = get_corrent_file_name(to_save_filename, ".csv", i)
             print "in = %s out = %s " % (input_path, output_path)
-            # step
-            ts = TS.TimeSeries(input_path, output_path, window, group_selected_items)
+            print "step = %s" % step
+            ts = TS.TimeSeries(input_path, output_path, window, group_selected_items, step)
             ts.generate_time_series_features()
             if len(files) == 1:
                 i = 0
