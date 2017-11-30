@@ -144,10 +144,15 @@ def distance(features_names, dataset):
     distance = 0
   return distance
 
+def average(values):
+    s = sum(values) + 0.0
+    return s/len(values)
+
+
 # ----------------------------------------------------------------- global variables ------------------------------------------------------------  
 
 
-time_series_per_feature_options = { 'average' : statistics.mean, 'last occurrence' : last , 'first derivative' : df, 'second derivative' : ddf}
+time_series_per_feature_options = { 'average' : average, 'last occurrence' : last , 'first derivative' : df, 'second derivative' : ddf}
 global_time_series_features_options = {'passed distance' : distance}
 
 # ----------------------------------------------------------------- getters ------------------------------------------------------------  
