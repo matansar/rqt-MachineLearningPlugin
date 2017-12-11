@@ -104,6 +104,10 @@ def randomly_object_identifying_scenario(scn_obj, number_simulations):
     create_restarting_file(scn_obj)
     rdoi.Run_Scenario(scn_obj, number_simulations)
 
+def apartment_scenario(scn_obj, source_x, source_y, angle):
+    import Apartment_Scenario as aparts
+    aparts.Run_Scenario(scn_obj, source_x, source_y, angle)
+
 # ------------------------------------------------
 
 def create_restarting_file(scn_obj):
@@ -214,6 +218,12 @@ def create_scenarios():
     name = "object identifying randomly"
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomly_object_identifying_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 7 -----------------------------------
+    scenario_id = 7
+    name = "navigation into an apartment"
+    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND)]
+    function = apartment_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
   
