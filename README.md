@@ -35,6 +35,7 @@ This repository offers a new rqt plugin that allows you to produce a dataset for
  * Run the setup.sh file and compile:
    ```{r, engine='sh', count_lines}
    cd ~/catkin_ws/src/rqt_mlp/install/
+   chmod +x setup.sh
    ./setup.sh
    ```
  * Rebuild your project:
