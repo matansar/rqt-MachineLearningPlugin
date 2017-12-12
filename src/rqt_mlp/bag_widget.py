@@ -139,7 +139,7 @@ class BagWidget(QWidget):
                 os.remove(path)
             else:
             # time.sleep(10)
-                with open("/var/tmp/logger_topic.log", 'r') as f:
+                with open(get_path() + "logger_topic.log", 'r') as f:
                     topics = f.read().splitlines()
                 self.start_recording(record_filename, selected_scenario, topics)
         except IOError:
@@ -500,3 +500,11 @@ class BagWidget(QWidget):
         print "dead shot"
         subprocess.Popen(restart_path, shell=True)
         self._timeline.handle_close()
+        
+def get_path():
+    import inspect, os
+    import logging
+    logging_file = os.path.dirname(
+        os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/History_Choosing/"
+    return logging_file
+  

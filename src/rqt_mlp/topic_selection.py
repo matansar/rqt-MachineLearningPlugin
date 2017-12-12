@@ -155,7 +155,7 @@ class TopicSelection(QWidget):
     def onButtonChooseCliked(self):
         for checkbox in self.items_list:
             checkbox.setCheckState(Qt.Unchecked)
-        with open("/var/tmp/logger_topic.log", 'r') as f:
+        with open(get_path() + "logger_topic.log", 'r') as f:
             topics = f.read().splitlines()
         for checkbox in self.items_list:
             if checkbox.text() in topics:
@@ -334,7 +334,7 @@ class TopicSelection(QWidget):
         # handler = logging.FileHandler('/var/tmp/logger_topic.log', mode='a')
         # logger_topic.addHandler(handler)
         topics = self.selected_topics
-        with open('/var/tmp/logger_topic.log', "w") as f:
+        with open(get_path() + 'logger_topic.log', "w") as f:
             for topic in topics:
                 f.write(topic + "\n")
         self.close()
@@ -346,3 +346,11 @@ class TopicSelection(QWidget):
     def getTopicsByName(self, name):
         arr = S.get_topics_options()
         return arr[name]
+
+
+def get_path():
+  import inspect, os
+  import logging
+  logging_file = os.path.dirname(
+      os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/History_Choosing/"
+  return logging_file

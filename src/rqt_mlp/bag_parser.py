@@ -251,7 +251,7 @@ class BagParser(QWidget):
     def onButtonChooseCliked(self):
         for checkbox in self.items_list_topics:
                 checkbox.setCheckState(Qt.Unchecked)
-        with open("/var/tmp/logger.log", 'r') as f:
+        with open(get_path() + "logger.log", 'r') as f:
             topics = f.read().splitlines()
         for checkbox in self.items_list_topics:
             if checkbox.text() in topics:
@@ -286,7 +286,7 @@ class BagParser(QWidget):
             topics = self.selected_bag_topics
             specific_features_selection = self.selected_specific_features
             general_features_selection = self.selected_general_features
-            with open('/var/tmp/logger.log', "w") as f:
+            with open(get_path() + 'logger.log', "w") as f:
                 for topic in topics:
                     f.write(topic + "\n")
                 for topic1 in specific_features_selection:
@@ -319,3 +319,11 @@ def get_corrent_file_name(filename, suffix, i = -1):
     else:
         ret = filename
     return ret
+  
+def get_path():
+    import inspect, os
+    import logging
+    logging_file = os.path.dirname(
+        os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/History_Choosing/"
+    return logging_file
+  
