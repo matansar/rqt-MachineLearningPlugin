@@ -30,8 +30,8 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "apartment.world",
     ros_launch = "roslaunch robotican_armadillo armadillo.launch kinect2:=true lidar:=true move_base:=true " \
                  "acml:=true have_map_file:=true map_file:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/maps/%s\" gazebo:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % (mapping ,world)
 
-    location = "x:=%s y:=%s Y:=%s" % (0,0,0)
-    #location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
+    #location = "x:=%s y:=%s Y:=%s" % (0,0,0)
+    location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
     time.sleep(SLEEPING_TIME)
@@ -74,7 +74,7 @@ def when_arrived(msg, args):
     logging_params(logging_msg + ", duration = %s" % (round(end_time_scenarios - start_scenarios_time,2)))
     waiting.unregister()
     pub.unregister()
-    time.sleep(2)
+    #time.sleep(2)
     scen_obj.close_bag()
     print "shut down"
   elif msg.status.status == 3:
@@ -94,19 +94,30 @@ def when_arrived(msg, args):
   #return msg
   
 def create_goal_msg(goal, seq):
+  import math, random, tf
   x = goal[0]
   y = goal[1]
   msg = MoveBaseActionGoal()
   msg.header.seq = seq
-  time = rospy.Time.now()
-  msg.header.stamp = time
+  t = rospy.Time.now()
+  msg.header.stamp = t
   msg.header.frame_id = ''
   msg.goal.target_pose.header.seq = seq
-  msg.goal.target_pose.header.stamp = time
+  msg.goal.target_pose.header.stamp = t
   msg.goal.target_pose.header.frame_id = 'map'
   msg.goal.target_pose.pose.position.x = x
   msg.goal.target_pose.pose.position.y = y
-  msg.goal.target_pose.pose.orientation.z = 1
+  orient = tf.transformations.quaternion_from_euler(0, 0, random.uniform(0, 2 * math.pi))
+  msg.goal.target_pose.pose.orientation.x = orient[0]
+  msg.goal.target_pose.pose.orientation.y = orient[1]
+  msg.goal.target_pose.pose.orientation.z = orient[2]
+  msg.goal.target_pose.pose.orientation.w = orient[3]
+  #print msg.goal.target_pose.pose.orientation.x
+  #print msg.goal.target_pose.pose.orientation.y
+  #print msg.goal.target_pose.pose.orientation.z
+  #print msg.goal.target_pose.pose.orientation.w
+  #time.sleep(20)
+  #msg.goal.target_pose.pose.orientation.z = 1
   return msg
   
 def publising_goals(scen_obj, goals):

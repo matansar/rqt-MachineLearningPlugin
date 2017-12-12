@@ -108,6 +108,10 @@ def apartment_scenario(scn_obj, source_x, source_y, angle):
     import Apartment_Scenario as aparts
     aparts.Run_Scenario(scn_obj, source_x, source_y, angle)
 
+def randomly_apartment_scenario(scn_obj, number_simulations):
+    import Randomaly_Apartment_Scenario as raparts
+    create_restarting_file(scn_obj)
+    raparts.Run_Scenario(scn_obj, number_simulations)
 # ------------------------------------------------
 
 def create_restarting_file(scn_obj):
@@ -224,6 +228,12 @@ def create_scenarios():
     name = "navigation into an apartment"
     params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND)]
     function = apartment_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 8 -----------------------------------
+    scenario_id = 8
+    name = "navigation into an apartment randomaly"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomly_apartment_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
   
