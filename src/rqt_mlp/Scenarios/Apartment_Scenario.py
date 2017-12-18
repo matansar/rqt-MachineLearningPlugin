@@ -28,7 +28,10 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "apartment.world",
     start_scenarios_time = rospy.Time.now().to_sec()
     logging_msg = "source x = %s, source y = %s, angle = %s, mapping = %s, world = %s" % (round(source_x,2), round(source_y,2), round(angle,4), mapping, world)
     ros_launch = "roslaunch robotican_armadillo armadillo.launch kinect2:=true lidar:=true move_base:=true " \
-                 "acml:=true have_map_file:=true map_file:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/maps/%s\" gazebo:=true world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % (mapping ,world)
+		 "moveit:=false use_sim_time:=true robot_localization:=true arm:=false controllers:=true " \
+                 "amcl:=true hector_slam:=false gmapping:=false gazebo:=true have_map_file:=true map_file:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/maps/%s\"  world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % (mapping ,world)
+
+
 
     #location = "x:=%s y:=%s Y:=%s" % (0,0,0)
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
@@ -147,7 +150,7 @@ def apply_simulation(scen_obj):
     area_1 = area(-0.5, 0.5, 0, 1)	
     area_2 = area(-7,-6.5,-3,-2.4)
     area_3 = area(-0.1,0.4,-8,-7.5)
-    area_4 = area(5, 5.7, -1, -2)
+    area_4 = area(5.1, 5.7, -1.2, -2)
     areas = [area_1,area_2,area_3,area_4]
     random.shuffle(areas)
     goals = create_goals(areas)
