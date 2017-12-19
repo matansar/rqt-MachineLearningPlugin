@@ -22,7 +22,7 @@ class area:
 
 
 
-def Run_Scenario(scen_obj, source_x, source_y, angle, world = "apartment.world", mapping = "apartment.yaml"):
+def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building.world", mapping = "building.yaml"):
     global start_scenarios_time, logging_msg
     source_x, source_y, angle = float(source_x), float(source_y), float(angle)
     start_scenarios_time = rospy.Time.now().to_sec()
@@ -141,16 +141,19 @@ def create_goals(areas):
   return goals
   
 def apply_simulation(scen_obj):
-    
     print "simulation started..."
     #area_1 = area(-0.5, 0.5, 0, 1)
     #area_2 = area(-0.5, 0.5, 0, 1)
     #area_3 = area(-0.5, 0.5, 0, 1)
     #area_4 = area(-0.5, 0.5, 0, 1)
-    area_1 = area(-0.5, 0.5, 0, 1)	
-    area_2 = area(-7,-6.5,-3,-2.4)
-    area_3 = area(-0.1,0.4,-8,-7.5)
-    area_4 = area(5.1, 5.7, -1.2, -2)
+    #area_1 = area(-0.5, 0.5, 0, 1)	
+    #area_2 = area(-7,-6.5,-3,-2.4)
+    #area_3 = area(-0.1,0.4,-8,-7.5)
+    #area_4 = area(5.1, 5.7, -1.2, -2)
+    area_1 = area(3.63597559929, 4.56262493134, -0.998919606209, 0.210190534592)	
+    area_2 = area(-5.22181129456,-4.34186172485,-0.946628332138,-0.340723633766)
+    area_3 = area(-5.32811450958,-3.61236262321,7.99595689774,8.32002067566)
+    area_4 = area(-0.504257440567, 0.0272606611252 ,6.49937057495 , 7.66467809677)
     areas = [area_1,area_2,area_3,area_4]
     random.shuffle(areas)
     goals = create_goals(areas)
