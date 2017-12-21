@@ -24,7 +24,7 @@ class ExtractFeatures:
   
     #include_nodes = ['/rosout']
   exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher', 'attacker', 'attack']
-  include_nodes = ['/slam_gmapping', '/twist_mux', '/robot_state_publisher']
+  include_nodes = ['/amcl', '/twist_mux', '/robot_state_publisher']
   include_hosts = ['matansar']
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
 

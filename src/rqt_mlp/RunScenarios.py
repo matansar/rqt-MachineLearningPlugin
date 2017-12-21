@@ -66,6 +66,9 @@ class RunScenario:
                 os.remove(scn_counter_path)
         self.__bag_obj.restart_recording(self.__restart_flag, path)
 
+    def get_topics(self):
+        return list(self.__selected_topics)
+        
     @staticmethod
     def __get_scenarios_params(scn_id):
         global scenarios
@@ -129,6 +132,7 @@ def create_restarting_file(scn_obj):
 
             # time.sleep(10)
             scn_obj.turn_on_restart_flag()
+	time.sleep(10)
         (selected_scenario['params'])[first_key] = (selected_scenario['params'])[first_key] - 1
         # time.sleep(5)
         if os.path.exists(scn_counter_path):
