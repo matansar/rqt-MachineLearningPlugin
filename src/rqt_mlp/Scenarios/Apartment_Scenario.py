@@ -32,8 +32,6 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building.world", 
 		 "moveit:=false use_sim_time:=true robot_localization:=true arm:=false controllers:=true " \
                  "amcl:=true hector_slam:=false gmapping:=false gazebo:=true have_map_file:=true map_file:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/maps/%s\"  world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % (mapping ,world)
 
-
-    
     #location = "x:=%s y:=%s Y:=%s" % (0,0,0)
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
@@ -42,13 +40,21 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building.world", 
     run_rviz()
     apply_diagnostic()
     apply_simulation(scen_obj)
-    #record_bag(scen_obj)
+    #record_start(scen_obj)
     scen_obj.generate_bag()
 
-def record_bag(scen_obj):
+def record_start(scen_obj):
   topics = scen_obj.get_topics()
   rosbag_cmd = "rosbag record " + reduce(lambda acc,curr: acc + " " + curr, topics, " ")
   return subprocess.Popen(rosbag_cmd, shell=True)
+
+def record_end(scen_obj):
+  import rosnode, rosgraph
+  nodes = rosnode.get_nodes_by_machine(rosgraph.network.get_host_name())
+  record_node = filter(lambda node_name: "record" in node_name, nodes)[0]
+  rosbag_cmd = "rosnode kill " + record_node
+  subprocess.Popen(rosbag_cmd, shell=True)
+  
 
 def run_rviz():
     rviz = "rosrun rviz rviz" #-d /home/lab/dwa.rviz"
@@ -77,20 +83,23 @@ next_goal = 1
 waiting = None
 def when_arrived(msg, args):
   global next_goal, logging_msg, start_scenarios_time, waiting
+  print "entered entered entered enteredentered entered entered "
   scen_obj, goals = args[0], args[1]
-  if next_goal >= len(goals): #end
+  if msg.status.status == 3 and next_goal >= len(goals): #end
     end_time_scenarios = rospy.Time.now().to_sec()
     logging_params(logging_msg + ", duration = %s" % (round(end_time_scenarios - start_scenarios_time,2)))
     waiting.unregister()
     #pub.unregister()
     time.sleep(2)
     scen_obj.close_bag()
-    time.sleep(2)
+    #record_end(scen_obj)
+    #time.sleep(10)
     print "shut down"
   elif msg.status.status == 3:
     publish(create_goal_msg(goals[next_goal], next_goal))
     #pub.publish(create_goal_msg(goals[next_goal], next_goal))
     next_goal = next_goal + 1
+    print next_goal
     
 
 #def create_simple_goal_msg(goal, seq):
