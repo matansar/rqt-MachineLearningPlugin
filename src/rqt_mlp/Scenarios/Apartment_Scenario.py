@@ -43,17 +43,17 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building.world", 
     #record_start(scen_obj)
     scen_obj.generate_bag()
 
-def record_start(scen_obj):
-  topics = scen_obj.get_topics()
-  rosbag_cmd = "rosbag record " + reduce(lambda acc,curr: acc + " " + curr, topics, " ")
-  return subprocess.Popen(rosbag_cmd, shell=True)
+#def record_start(scen_obj):
+  #topics = scen_obj.get_topics()
+  #rosbag_cmd = "rosbag record " + reduce(lambda acc,curr: acc + " " + curr, topics, " ")
+  #return subprocess.Popen(rosbag_cmd, shell=True)
 
-def record_end(scen_obj):
-  import rosnode, rosgraph
-  nodes = rosnode.get_nodes_by_machine(rosgraph.network.get_host_name())
-  record_node = filter(lambda node_name: "record" in node_name, nodes)[0]
-  rosbag_cmd = "rosnode kill " + record_node
-  subprocess.Popen(rosbag_cmd, shell=True)
+#def record_end(scen_obj):
+  #import rosnode, rosgraph
+  #nodes = rosnode.get_nodes_by_machine(rosgraph.network.get_host_name())
+  #record_node = filter(lambda node_name: "record" in node_name, nodes)[0]
+  #rosbag_cmd = "rosnode kill " + record_node
+  #subprocess.Popen(rosbag_cmd, shell=True)
   
 
 def run_rviz():
@@ -83,16 +83,15 @@ next_goal = 1
 waiting = None
 def when_arrived(msg, args):
   global next_goal, logging_msg, start_scenarios_time, waiting
-  print "entered entered entered enteredentered entered entered "
   scen_obj, goals = args[0], args[1]
   if msg.status.status == 3 and next_goal >= len(goals): #end
     end_time_scenarios = rospy.Time.now().to_sec()
     logging_params(logging_msg + ", duration = %s" % (round(end_time_scenarios - start_scenarios_time,2)))
     waiting.unregister()
     #pub.unregister()
-    time.sleep(2)
-    scen_obj.close_bag()
-    #record_end(scen_obj)
+    terminate()
+    #time.sleep(2)
+    #scen_obj.close_bag()
     #time.sleep(10)
     print "shut down"
   elif msg.status.status == 3:
@@ -101,7 +100,10 @@ def when_arrived(msg, args):
     next_goal = next_goal + 1
     print next_goal
     
-
+def terminate():
+  clean_script = "/home/matansar/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/Extentions/scripts/restart.sh"
+  subprocess.Popen(clean_script, shell=True)
+  
 #def create_simple_goal_msg(goal, seq):
   #x = goal[0]
   #y = goal[1]
