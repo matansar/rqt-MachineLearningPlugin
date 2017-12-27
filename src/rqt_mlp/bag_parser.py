@@ -300,11 +300,20 @@ class BagParser(QWidget):
                 if len(self.bag_files) == 1:
                     counter = -1
                 temp = get_corrent_file_name(filename[0], ".csv", counter)
+                #temp = generate_csv_from_bag(temp, bag_file)
                 # temp = "%s_%s%s" % (filename[0],counter,".csv")
                 E.write_to_csv(temp, df)
                 counter = counter + 1
             QMessageBox.about(self, "csv export", "csv was exported successfuly")
 
+def generate_csv_from_bag(csv_file, bag_file):
+    bag_split = csv_file.split('/')
+    csv_split = bag_file.split('/')
+    bag_split[len(bag_split) - 1] = csv_split[len(csv_split) - 1]
+    tmp =  reduce(lambda acc,curr: acc + "/" + curr , bag_split, "")
+    tmp = tmp[:-4] + ".csv"
+    return tmp
+    
 def get_corrent_file_name(filename, suffix, i = -1):
     if filename == "":
         return ""

@@ -1,14 +1,14 @@
 import os
 import subprocess
 import time
-import random
 import rospy
 from move_base_msgs.msg import MoveBaseActionResult
 from move_base_msgs.msg import MoveBaseActionGoal
 from geometry_msgs.msg import PoseStamped
+import random
 
 
-SLEEPING_TIME = 15 ### related to computer's force
+SLEEPING_TIME = random.uniform(8, 15) #15
 rosbag_process = None
 start_scenarios_time = None
 logging_msg = None
@@ -36,7 +36,8 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building.world", 
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
-    time.sleep(SLEEPING_TIME)
+    raw_input("Press Enter to continue...")
+    #time.sleep(SLEEPING_TIME)
     run_rviz()
     apply_diagnostic()
     apply_simulation(scen_obj)
@@ -155,8 +156,16 @@ def publising_goals(scen_obj, goals):
   waiting = rospy.Subscriber('/move_base/result', MoveBaseActionResult, when_arrived, (scen_obj, goals))
   msg = create_goal_msg(goals[0],0)
   time.sleep(2)
+  #apply_nav_vel_publisher()
   #pub.publish(msg)
   publish(msg)
+
+
+def apply_nav_vel_publisher():
+  rate = 4
+  goal = "roslaunch robotican_demos attacker.launch rate:=%s" % (rate) 
+  subprocess.Popen(goal, shell=True)
+  print "/nev_val ATTACKING is started in rate:=%s" % (rate)
 
 def create_goals(areas):
   goals = []
@@ -178,7 +187,6 @@ def apply_simulation(scen_obj):
     print "simulation started..."
     area_1 = area(3.63597559929, 4.56262493134, -1, -0.1)	
     area_2 = area(-5.22181129456,-4.34186172485,-0.946628332138,-0.340723633766)
-    #area_3 = area(-8.187541008, -7.81834888458, -1.72615361214, -0.75048917532)
     area_3 = area(-5.32811450958,-3.61236262321,7.99595689774,8.32002067566)
     area_4 = area(-0.504257440567, -0.4 ,6.49937057495 , 7.66467809677)
     areas = [area_1,area_2,area_3,area_4]
