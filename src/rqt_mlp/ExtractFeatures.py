@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 ## Phase 2
 
+#from __future__ import print_function
 import rosbag
 import rospy
 import time
@@ -24,7 +25,7 @@ class ExtractFeatures:
   
     #include_nodes = ['/rosout']
   exclude_nodes = ['gazebo','rviz','record', 'rqt', 'rosprofiler', 'rosgrapher', 'attacker', 'attack']
-  include_nodes = ['/amcl', '/twist_mux', '/robot_state_publisher']
+  include_nodes = ['/amcl', '/twist_mux', '/robot_state_publisher', '/move_base', '/map_odom_broadcaster']
   include_hosts = ['matansar']
 # ------------------------------------------------------------ constructor ------------------------------------------------------------  
 
@@ -67,12 +68,13 @@ class ExtractFeatures:
     bag = rosbag.Bag(bag_file)
     stime = bag.get_start_time() # represented by float
     etime = bag.get_end_time()	 # represented by float
-    print("Extract Features on %s (bag file)..." % (bag_file))
+    print("--------- Extract Features on %s..." % (bag_file))
     while (stime + self.__window <= etime):
       #print("stime = %s | etime = %s" % (stime , stime + self.__window))
       features = self.__get_features(bag, stime, stime + self.__window)   
       df = df.append([features])
       stime = stime + self.__window
+    print("Finished!")
     bag.close()
     df.columns = self.__features_name
     return df
@@ -83,10 +85,15 @@ class ExtractFeatures:
   # return the features in the same calling's order
   def __get_features(self, bag, stime, etime):
     general_features = self.__get_general_features(bag, stime, etime)
+    #print "\t2. extract nav_vel features..."
     nav_vel_features = self.__get_features_nav_vel(bag, stime, etime)
-    mb_feedback_features = self.__get_features_move_bsae_feedback(bag, stime, etime)
+    #print "\t3. extract feedback features..."
+    mb_feedback_features = self.__get_features_move_base_feedback(bag, stime, etime)
+    #print "\t4. extract node_diagnostic features..."
     node_diagnostic_features = self.__get_features_node_diagnostic(bag, stime, etime)
+    #print "\t5. extract host_diagnostic features..."
     host_diagnostic_features = self.__get_features_host_diagnostic(bag, stime, etime)
+    #print "\t6. extract statistics features..."
     statistics_features = self.__get_features_statistics(bag, stime, etime)
     return general_features + nav_vel_features + mb_feedback_features + node_diagnostic_features + host_diagnostic_features + statistics_features
         
@@ -199,7 +206,7 @@ class ExtractFeatures:
     return ret
       
   # Movebase_Feedback - return the features in the same calling's order    
-  def __get_features_move_bsae_feedback(self, bag, stime, etime):
+  def __get_features_move_base_feedback(self, bag, stime, etime):
     topic = '/move_base/feedback'
     ret = []
     messages = list(bag.read_messages(start_time = rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics = [topic]))
@@ -597,21 +604,21 @@ def print_bag(bag_file, path_file,window):
 
 
 
-if __name__ == '__main__':
-  ApplyOptions()
-  dic = dict(threads = '# of nodes\' threads', max_cpu_node = 'CPU maximun load by nodes', min_cpu_node = 'CPU minimum load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes',min_virt_mem = 'minimun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes',min_real_mem = 'minimum real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes')
-  bag_path = "bags/diagnostic.bag"
-  output_path = "bags/diagnostic.csv"
-  path_file = "bags/diagnostic.info"
-  topics = ['/host_diagnostic']
-  window = 1
-  general_features_selection = []
-  #specific_features_selection  = dic.values()
-  specific_features_selection = ['CPU host load infomation']
-  ef = ExtractFeatures(topics, window, specific_features_selection, general_features_selection)
-  df = ef.generate_features(bag_path)
-  write_to_csv(output_path, df)
-  print_bag(bag_path, path_file,window)
+#if __name__ == '__main__':
+  #ApplyOptions()
+  #dic = dict(threads = '# of nodes\' threads', max_cpu_node = 'CPU maximun load by nodes', min_cpu_node = 'CPU minimum load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes',min_virt_mem = 'minimun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes',min_real_mem = 'minimum real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes')
+  #bag_path = "bags/diagnostic.bag"
+  #output_path = "bags/diagnostic.csv"
+  #path_file = "bags/diagnostic.info"
+  #topics = ['/host_diagnostic']
+  #window = 1
+  #general_features_selection = []
+  ##specific_features_selection  = dic.values()
+  #specific_features_selection = ['CPU host load infomation']
+  #ef = ExtractFeatures(topics, window, specific_features_selection, general_features_selection)
+  #df = ef.generate_features(bag_path)
+  #write_to_csv(output_path, df)
+  #print_bag(bag_path, path_file,window)
   
     
   
