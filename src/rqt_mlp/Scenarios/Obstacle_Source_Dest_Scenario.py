@@ -35,7 +35,6 @@ def apply_obstacle_world(world, obstacle, obstacle_x,obstacle_y):
 def write_to_xml(path_file, xml_path, data, location = 0):
     from xml.etree import ElementTree as ET
     tree = ET.parse(path_file)
-    print tree
     (tree.findall(xml_path))[location].text = data
     tree.write(path_file)
 

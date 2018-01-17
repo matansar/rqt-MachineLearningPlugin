@@ -187,7 +187,7 @@ class BagParser(QWidget):
 
     def updateList(self, state, item_clicked, topic=None, force_update_state=False):
         if topic is None:  # The "All" checkbox was checked / unchecked
-            print "if topic is None"
+            # print "if topic is None"
             if state == Qt.Checked:
                 self.item_all.setTristate(False)
                 for item in self.items_list_topics:
@@ -201,7 +201,7 @@ class BagParser(QWidget):
                             item.selection_vlayout == item_clicked.selection_vlayout:
                         item.setCheckState(Qt.Unchecked)
         else:
-            print "else:"
+            # print "else:"
             if state == Qt.Checked:
                 item_clicked.selected_list.append(topic)
                 print item_clicked.selected_list
@@ -300,7 +300,7 @@ class BagParser(QWidget):
                 if len(self.bag_files) == 1:
                     counter = -1
                 temp = get_corrent_file_name(filename[0], ".csv", counter)
-                #temp = generate_csv_from_bag(temp, bag_file)
+                temp = generate_csv_from_bag(temp, bag_file)
                 # temp = "%s_%s%s" % (filename[0],counter,".csv")
                 E.write_to_csv(temp, df)
                 counter = counter + 1
@@ -318,7 +318,7 @@ def get_corrent_file_name(filename, suffix, i = -1):
     if filename == "":
         return ""
     file_suffix = filename[-len(suffix):]
-    print file_suffix
+    # print file_suffix
     if file_suffix == suffix and i >= 0:
         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
     elif file_suffix != suffix and i >= 0:

@@ -82,8 +82,8 @@ class NodeSelection(QWidget):
         state = master.getSystemState()
         subs = [t for t, l in state[1]
                 if len([node_name for node_name in self.selected_nodes if node_name in l]) > 0]
-        print subs
-        print len(subs)
+        # print subs
+        # print len(subs)
         for topic in subs:
             self.parent_widget.changeTopicCheckState(topic, Qt.Checked)
             self.parent_widget.updateList(Qt.Checked, topic, topic)

@@ -19,7 +19,7 @@ class inputDialog(QWidget):
         self.client_answers_items = []
         self.greather_conditions = []
         self.button_clicked = False
-        print params
+        # print params
         for item in params:
             param = item[0]
             label = item[1]
@@ -74,7 +74,7 @@ class inputDialog(QWidget):
             condition = self.greather_conditions[counter][1]
             param = self.greather_conditions[counter][0]
             print "condition = %s param = %s val = %s" % (condition, param, val)
-            print param
+            # print param
 
             if not condition == NO_COND:
                 if val <= float(condition):

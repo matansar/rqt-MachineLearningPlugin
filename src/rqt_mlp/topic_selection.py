@@ -171,7 +171,7 @@ class TopicSelection(QWidget):
 
     def params_answer(self, params, label_items, id_radio):
         if id_radio == 0:
-            print "------" + str(id_radio)
+            # print "------" + str(id_radio)
             self.number_group.setExclusive(False)
             # print self.radio_items
             for item in self.radio_items:
@@ -180,19 +180,16 @@ class TopicSelection(QWidget):
             self.number_group.setExclusive(True)
             self.enable_record()
         else:
-            print id_radio
-            print params
+            # print id_radio
+            # print params
             # print params.values()
             a = {}
-            print label_items
+            # print label_items
             for item, name in zip(params, label_items):
-                print item
-                print name
                 # value = params[item].text()
                 a[name] = item.text().encode("utf-8")
-            print a
+            # print a
             self.map_answer = {"id": id_radio, "params": a}
-            print self.map_answer
             self.enable_record()
             return self.map_answer
 
@@ -313,10 +310,10 @@ class TopicSelection(QWidget):
             if self.radio_items[item].isChecked():
                 flag = True
                 break
-            print self.radio_items[item]
+            # print self.radio_items[item]
 
         # flag = reduce(lambda acc, curr: acc or , self.radio_items, False)
-        print "------+++++-" + str(flag)
+        # print "------+++++-" + str(flag)
         if len(temp_selected_topics) > 0 or len(self.selected_topics) > 0:
             self.ok_button.setEnabled(flag)
         else:
@@ -328,7 +325,7 @@ class TopicSelection(QWidget):
             if item:
                 for i in item:
                     self.selected_topics.append(i)
-        print "-----" + str(self.selected_topics)
+        # print "-----" + str(self.selected_topics)
 
         # Defined Logging
         # handler = logging.FileHandler('/var/tmp/logger_topic.log', mode='a')

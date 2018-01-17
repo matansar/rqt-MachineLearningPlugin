@@ -334,7 +334,7 @@ class BagWidget(QWidget):
         fd = QFileDialog(self)
         wc = "Bag files {.bag} (*.bag)"
         path, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.bag'), directory=current_directory)
-        print path
+        # print path
         if len(path) != 0:
             with open(filepath, "w") as f:
                 f.write(path[0])
@@ -357,7 +357,6 @@ class BagWidget(QWidget):
     def get_bag_files(self, path):
         import glob
         files = glob.glob(path + "*.bag")
-        print "------" + str(files)
         return files
 
     def get_features_from_bags(self, bag_files):
@@ -486,9 +485,9 @@ class BagWidget(QWidget):
     def remove_tmp_files(self):
         import glob, inspect
         tmp_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/tmp/"
-        print tmp_path
+        # print tmp_path
         files = glob.glob('%s*'% tmp_path)
-        print files
+        # print files
         for f in files:
             os.remove(f)
 
