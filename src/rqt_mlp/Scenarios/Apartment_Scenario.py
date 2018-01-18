@@ -8,23 +8,15 @@ from geometry_msgs.msg import PoseStamped
 import random
 
 
-SLEEPING_TIME = random.uniform(8, 15) #15
+SLEEPING_TIME = random.uniform(15, 22) #15
 rosbag_process = None
 start_scenarios_time = None
 logging_msg = None
 
-
-class area: 
-  def __init__(self, x_min, x_max, y_min, y_max):
-    self.x_min = x_min 
-    self.x_max = x_max
-    self.y_min = y_min
-    self.y_max = y_max
-
-
-
-def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building_version_7.world", mapping = "building.yaml"):
+def Run_Scenario(scen_obj, source_x, source_y, angle, goals, world = "", mapping = ""):
     global start_scenarios_time, logging_msg
+    print world
+    time.sleep(10)
     source_x, source_y, angle = float(source_x), float(source_y), float(angle)
     start_scenarios_time = rospy.Time.now().to_sec()
     logging_msg = "source x = %s, source y = %s, angle = %s, mapping = %s, world = %s" % (round(source_x,2), round(source_y,2), round(angle,4), mapping, world)
@@ -32,15 +24,14 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, world = "building_version_
 		 "moveit:=false use_sim_time:=true robot_localization:=true arm:=false controllers:=true " \
                  "amcl:=true hector_slam:=false gmapping:=false gazebo:=true have_map_file:=true map_file:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/maps/%s\"  world_name:=\"`rospack find rqt_mlp`/src/rqt_mlp/Scenarios/Extentions/worlds/%s\" " % (mapping ,world)
 
-    #location = "x:=%s y:=%s Y:=%s" % (0,0,0)
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
-    raw_input("Press Enter to continue...")
-    #time.sleep(17)
+    # raw_input("Press Enter to continue...")
+    time.sleep(random.uniform(15, 22))
     run_rviz()
     apply_diagnostic()
-    apply_simulation(scen_obj)
+    apply_simulation(scen_obj, goals)
     #record_start(scen_obj)
     scen_obj.generate_bag()
 
@@ -92,7 +83,7 @@ def when_arrived(msg, args):
     #pub.unregister()
     terminate()
     #time.sleep(2)
-    #scen_obj.close_bag()
+    # scen_obj.close_bag()
     #time.sleep(10)
     print "shut down"
   elif msg.status.status == 3:
@@ -166,38 +157,11 @@ def apply_nav_vel_publisher():
   subprocess.Popen(goal, shell=True)
   print "/nev_val ATTACKING is started in rate:=%s" % (rate)
 
-def create_goals(areas):
-  goals = []
-  for area in areas:
-    goal_x = random.uniform(area.x_min, area.x_max)
-    goal_y = random.uniform(area.y_min, area.y_max)
-    goals.append((goal_x, goal_y))
-  return goals
-
 def publish(msg):
   goal = "rostopic pub /move_base/goal move_base_msgs/MoveBaseActionGoal " + msg
   subprocess.Popen(goal, shell=True)
   print "A Goal is Published" #: " + str(msg)
   
-def apply_simulation(scen_obj):
-    import threading
-    from multiprocessing import Process
-
+def apply_simulation(scen_obj, goals):
     print "simulation started..."
-    area_1 = area(3.63597559929, 4.56262493134, -1, -0.1)	
-    area_2 = area(-5.22181129456,-4.34186172485,-0.946628332138,-0.340723633766)
-    area_3 = area(-5.32811450958,-3.61236262321,7.99595689774,8.32002067566)
-    area_4 = area(-0.504257440567, -0.4 ,6.49937057495 , 7.66467809677)
-    areas1 = [area_1,area_2]
-    areas2 = [area_3,area_4]
-    random.shuffle(areas1)
-    random.shuffle(areas2)
-    areas = areas1 + areas2
-    #random.shuffle(areas)
-    goals = create_goals(areas)
     publising_goals(scen_obj, goals)
-    #thread = threading.Thread(target = publising_goals, args = (scen_obj, goals))
-    #thread.start()
-
-    #p = Process(target=publising_goals, args= (scen_obj, goals))
-    #p.start()
