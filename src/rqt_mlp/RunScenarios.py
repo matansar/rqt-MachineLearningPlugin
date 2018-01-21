@@ -141,12 +141,28 @@ def randomly_corridor_scenario(scn_obj, number_simulations):
     goals = Create_Goals.corridor_goals()
     raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor.world", mapping="vert_corridor.yaml")
 
-def randomly_obs_corridor_scenario(scn_obj, number_simulations):
+def randomly_stuff_corridor_scenario(scn_obj, number_simulations):
     import Create_Goals
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.corridor_goals()
     raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff.world", mapping="vert_corridor_stuff.yaml")
+
+# def randomly_obs_corridor_scenario(scn_obj, number_simulations):
+#     import Create_Goals
+#     import Randomaly_Apartment_Scenario as raparts
+#     create_restarting_file(scn_obj)
+#     goals = Create_Goals.corridor_goals()
+#     raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor.world", mapping="vert_corridor.yaml")
+
+def randomly_obstacles_stuff_corridor_scenario(scn_obj, number_simulations):
+    import Create_Goals
+    import Randomaly_Apartment_Scenario as raparts
+    create_restarting_file(scn_obj)
+    goals = Create_Goals.corridor_goals()
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff_obs.world", mapping="vert_corridor_stuff.yaml")
+
+
 
 # ------------------------------------------------
 
@@ -292,9 +308,15 @@ def create_scenarios():
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 12 -----------------------------------
     scenario_id = 12
-    name = "navigation into a corridor with obstacles randomaly"
+    name = "navigation into a corridor with stuffs randomaly"
     params = [('number of simulations', 'greater than zero', 0)]
-    function = randomly_obs_corridor_scenario
+    function = randomly_stuff_corridor_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 13 -----------------------------------
+    scenario_id = 13
+    name = "navigation into a corridor with stuffs and obstacles randomaly"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomly_obstacles_stuff_corridor_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
 
