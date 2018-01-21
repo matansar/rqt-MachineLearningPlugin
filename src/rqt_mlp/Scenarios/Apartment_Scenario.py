@@ -91,9 +91,9 @@ def when_arrived(msg, args):
     #pub.publish(create_goal_msg(goals[next_goal], next_goal))
     next_goal = next_goal + 1
 
-# def terminate():
-#   clean_script = "/home/lab/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/Extentions/scripts/restart.sh"
-#   subprocess.Popen(clean_script, shell=True)
+def terminate():
+  clean_script = "/home/matansar/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/Extentions/scripts/restart.sh"
+  subprocess.Popen(clean_script, shell=True)
   
 #def create_simple_goal_msg(goal, seq):
   #x = goal[0]
