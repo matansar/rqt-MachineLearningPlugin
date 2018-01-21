@@ -145,7 +145,7 @@ def randomly_obs_corridor_scenario(scn_obj, number_simulations):
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.corridor_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_obs.world", mapping="vert_corridor_obs.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff.world", mapping="vert_corridor_stuff.yaml")
 
 # ------------------------------------------------
 
