@@ -252,7 +252,8 @@ class BagWidget(QWidget):
 
     def apply_restart(self, reindex_bag):
         import inspect, subprocess
-        restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/scripts/restart.sh " + reindex_bag[:-4]
+        subprocess.Popen("rosbag reindex \"%s\" && rm \"%s\"" % (reindex_bag, reindex_bag[:-4] + ".orig.bag"), shell=True) # for reindexing
+        restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/scripts/restart.sh"
         subprocess.Popen(restart_path, shell=True)
 
     def _handle_history_clicked(self):
