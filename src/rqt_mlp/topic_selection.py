@@ -2,7 +2,7 @@ import rosgraph
 import RunScenarios as S
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
+from python_qt_binding.QtWidgets import QFileDialog, QLineEdit, QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
     QCheckBox, QScrollArea, QPushButton
 from .node_selection import NodeSelection
 from MyQCheckBox import MyQCheckBox
@@ -29,7 +29,7 @@ class TopicSelection(QWidget):
         all_topics = S.get_topics_options()
         keys = all_topics.keys()
         # print all_topics.keys()[0]
-
+        self.plp_filename = ""
         self.group_selected_items = dict()
         self.group_areas = dict()
         self.group_main_widget = dict()
@@ -88,6 +88,23 @@ class TopicSelection(QWidget):
             self.radio_items[id_radio].setChecked(False)
             self.radio_items[id_radio].clicked.connect(
                 partial(self.callConsult, scanarios[id_radio]["params"], id_radio))
+
+        self.select_path = QLineEdit()
+        self.save_path = QLineEdit()
+
+        self.select_path.setEnabled(False)
+        self.save_path.setEnabled(False)
+
+        self.plp_button = QPushButton("Select PLP Python File...", self)
+        self.plp_button.clicked.connect(self.onPlpClicked)
+
+        self.two_buttons1 = QHBoxLayout(self)
+
+        self.two_buttons1.addWidget(self.plp_button)
+
+        self.two_buttons1.addWidget(self.select_path)
+
+        self.main_vlayout.addLayout(self.two_buttons1)
 
         # self.label = QLabel("live Topics", self)
         # self.label.setAlignment(Qt.AlignCenter)
@@ -335,7 +352,35 @@ class TopicSelection(QWidget):
             for topic in topics:
                 f.write(topic + "\n")
         self.close()
-        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
+        if self.plp_filename != "":
+            from .plp import Plp
+            Plp(self.plp_filename)
+        # self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
+
+    def get_current_opened_directory(self, filepath):
+        import os
+        direc = "/"
+        if os.path.isfile(filepath):
+            with open(filepath, 'r') as f:
+                pathes = f.read()
+                direc = pathes.rsplit('/', 1)[0]
+        return direc
+
+    def onPlpClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_plp.log"
+        current_directory = self.get_current_opened_directory(filepath)
+        fd = QFileDialog(self)
+        wc = "Csv files {.py} (*.py)"
+        # print current_directory
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.py'), directory=current_directory)
+        if len(filename):
+            self.plp_filename = filename[0]
+            with open(filepath, "w") as f:
+                f.write(self.plp_filename)
+            self.select_path.setText(self.plp_filename)
+            # print self.plp_filename[0]
+
 
     def onFromNodesButtonClicked(self):
         self.node_selection = NodeSelection(self)
