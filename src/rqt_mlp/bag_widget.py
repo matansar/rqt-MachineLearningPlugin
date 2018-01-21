@@ -250,9 +250,9 @@ class BagWidget(QWidget):
         self.topic_selection = TopicSelection()
         self.topic_selection.recordSettingsSelected.connect(self._on_record_settings_selected)
 
-    def apply_restart(self):
+    def apply_restart(self, reindex_bag):
         import inspect, subprocess
-        restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/scripts/restart.sh"
+        restart_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/scripts/restart.sh " + reindex_bag[:-4]
         subprocess.Popen(restart_path, shell=True)
 
     def _handle_history_clicked(self):
@@ -301,8 +301,8 @@ class BagWidget(QWidget):
 
         # self.load_button.setEnabled(False)
         self._recording = True
-        run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics)
-        run_scen.run_record_scenario()
+        self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics)
+        self.run_scen.run_record_scenario()
 
         self.load_button.setEnabled(False)
         self.history_button.setEnabled(False)
@@ -323,7 +323,7 @@ class BagWidget(QWidget):
 
     def _handle_restart_clicked(self):
         self.handle_destroy()
-        self.apply_restart()
+        self.apply_restart(self.run_scen.get_export_bag())
 
     def _handle_load_clicked(self):
         # path = QFileDialog.getOpenFileName(self, self.tr('Load from File'), '.', self.tr('Bag files {.bag} (*.bag)'))

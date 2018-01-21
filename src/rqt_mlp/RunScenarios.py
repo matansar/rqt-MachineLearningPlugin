@@ -58,14 +58,15 @@ class RunScenario:
     def generate_bag(self):
         self.__bag_obj.record_bag(self.__export_bag, False, self.__selected_topics)
 
-    def close_bag(self, delete=0):
-        path = ""
-        if delete != 0:
-            path = self.__export_bag
+    def close_bag(self):
+        # path = ""
+        # if delete != 0:
+        #     path = self.__export_bag
         if not self.__restart_flag:
             if os.path.exists(scn_counter_path):
                 os.remove(scn_counter_path)
-        self.__bag_obj.restart_recording(self.__restart_flag, path)
+        self.__bag_obj.restart_recording(self.__export_bag)
+        # self.__bag_obj.restart_recording(self.__restart_flag, path)
 
     def get_topics(self):
         return list(self.__selected_topics)

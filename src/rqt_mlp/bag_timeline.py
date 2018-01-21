@@ -693,23 +693,24 @@ class BagTimeline(QGraphicsScene):
 
         self.update()
 
-    def restart_recording(self, restart_flag, path):
+    def restart_recording(self, reindex_bag):
+        self._BagWidget.apply_restart(reindex_bag)
         import os
-        self._BagWidget.record_button.setIcon(QIcon.fromTheme('view-refresh'))
-        self._BagWidget.record_button.setToolTip("Refresh Screen")
-        self._BagWidget.restart_button.setEnabled(False)
+        # self._BagWidget.record_button.setIcon(QIcon.fromTheme('view-refresh'))
+        # self._BagWidget.record_button.setToolTip("Refresh Screen")
+        # self._BagWidget.restart_button.setEnabled(False)
+        #
+        # self._BagWidget.load_button.setEnabled(True)
+        # self._BagWidget.history_button.setEnabled(True)
+        #
+        # self._BagWidget._restarting = True
+        # self.handle_close()
+        # if path != "":
+        #     os.remove(path)
+        # if restart_flag:
 
-        self._BagWidget.load_button.setEnabled(True)
-        self._BagWidget.history_button.setEnabled(True)
-
-        self._BagWidget._restarting = True
-        self.handle_close()
-        if path != "":
-            os.remove(path)
-        if restart_flag:
-            self._BagWidget.apply_restart()
-        else:
-            self.make_pop_up.emit()
+        # else:
+        #     self.make_pop_up.emit()
 
     # def apply_record_icon(self):
     #     self._BagWidget.record_button.setIcon(QIcon.fromTheme('media-record'))

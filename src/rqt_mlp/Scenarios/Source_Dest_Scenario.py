@@ -55,12 +55,12 @@ def apply_simulation(scen_obj, distance):
     rospy.Subscriber("/move_base/result", MoveBaseActionResult, is_arrived, scen_obj)
     # rospy.Subscriber("/move_base/feedback", MoveBaseActionFeedback, check_deadline, scen_obj)
 
-def check_deadline(msg, scen_obj):
-    now = rospy.Time.now().to_sec()
-    current_duration = now - start_scenarios_time
-    if current_duration > scenario_deadline:
-        scen_obj.close_bag(delete=1)
-        print "too much time"
+# def check_deadline(msg, scen_obj):
+#     now = rospy.Time.now().to_sec()
+#     current_duration = now - start_scenarios_time
+#     if current_duration > scenario_deadline:
+#         scen_obj.close_bag(delete=1)
+#         print "too much time"
 
 def is_arrived(msg, scen_obj):
     global logging_msg, start_scenarios_time, scenario_deadline
