@@ -355,7 +355,7 @@ class TopicSelection(QWidget):
         if self.plp_filename != "":
             from .plp import Plp
             Plp(self.plp_filename)
-        # self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
+        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
 
     def get_current_opened_directory(self, filepath):
         import os
