@@ -262,8 +262,7 @@ class BagParser(QWidget):
         direc = "/"
         if os.path.isfile(filepath):
             with open(filepath, 'r') as f:
-                pathes = f.read()
-                direc = pathes.rsplit('/', 1)[0]
+                direc = f.read()
         return direc
 
     def onButtonClicked(self):
