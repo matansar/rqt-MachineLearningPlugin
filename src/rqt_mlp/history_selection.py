@@ -334,7 +334,7 @@ class HistorySelection(QWidget):
         # print current_directory
         # self._to_save_filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory,
         #                                                      self.tr('csv (*.csv)'))
-        self.saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory", current_directory))
         # if self._to_save_filename[0] != "":
         #     with open(filepath, "w") as f:
         #         f.write(self._to_save_filename[0])

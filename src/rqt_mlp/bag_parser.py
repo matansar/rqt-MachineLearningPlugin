@@ -280,7 +280,7 @@ class BagParser(QWidget):
             QMessageBox.about(self, "Error in Window Time", "time need to be smaller than: " + str(self.duration))
             return
         # filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory, self.tr('csv (*.csv)'))
-        saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory", current_directory))
         # if filename[0] != '':
         #     with open(filepath, "w") as f:
         #         f.write(filename[0])
