@@ -15,7 +15,7 @@ logging_msg = None
 
 def Run_Scenario(scen_obj, source_x, source_y, angle, goals, world = "", mapping = ""):
     global start_scenarios_time, logging_msg
-    print world
+    # print world
     time.sleep(10)
     source_x, source_y, angle = float(source_x), float(source_y), float(angle)
     start_scenarios_time = rospy.Time.now().to_sec()

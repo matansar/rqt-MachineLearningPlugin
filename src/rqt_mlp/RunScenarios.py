@@ -109,6 +109,7 @@ def randomly_object_identifying_scenario(scn_obj, number_simulations):
     create_restarting_file(scn_obj)
     rdoi.Run_Scenario(scn_obj, number_simulations)
 
+
 def apartment_scenario(scn_obj, source_x, source_y, angle):
     import Apartment_Scenario as aparts
     aparts.Run_Scenario(scn_obj, source_x, source_y, angle)
@@ -120,6 +121,13 @@ def randomly_building_scenario(scn_obj, number_simulations):
     goals = Create_Goals.building_goals()
     raparts.Run_Scenario(scn_obj, number_simulations, goals,  world = "buildings/building.world", mapping = "building.yaml")
 
+def randomly_obstacle_cans_scenario(scn_obj, number_simulations):
+    import Create_Goals
+    import Randomaly_Apartment_Scenario as raparts
+    create_restarting_file(scn_obj)
+    goals = Create_Goals.cans_goals()
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world = "cans/cans_1_obs.world", mapping = "cans_1.yaml")
+
 def randomly_cans_scenario(scn_obj, number_simulations):
     import Create_Goals
     import Randomaly_Apartment_Scenario as raparts
@@ -127,12 +135,12 @@ def randomly_cans_scenario(scn_obj, number_simulations):
     goals = Create_Goals.cans_goals()
     raparts.Run_Scenario(scn_obj, number_simulations, goals, world = "cans/cans_1.world", mapping = "cans_1.yaml")
 
-def randomly_clean_room_scenario(scn_obj, number_simulations):
-    import Create_Goals
-    import Randomaly_Apartment_Scenario as raparts
-    create_restarting_file(scn_obj)
-    goals = Create_Goals.cans_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="cans/clean_1.world", mapping="clean_1.yaml")
+# def randomly_clean_room_scenario(scn_obj, number_simulations):
+#     import Create_Goals
+#     import Randomaly_Apartment_Scenario as raparts
+#     create_restarting_file(scn_obj)
+#     goals = Create_Goals.cans_goals()
+#     raparts.Run_Scenario(scn_obj, number_simulations, goals, world="cans/clean_1.world", mapping="clean_1.yaml")
 
 def randomly_corridor_scenario(scn_obj, number_simulations):
     import Create_Goals
@@ -290,33 +298,33 @@ def create_scenarios():
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 9 -----------------------------------
     scenario_id = 9
-    name = "navigation into cans randomaly"
-    params = [('number of simulations', 'greater than zero', 0)]
-    function = randomly_cans_scenario
-    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    # scenarios 10 -----------------------------------
-    scenario_id = 10
-    name = "navigation into a clean room randomaly"
-    params = [('number of simulations', 'greater than zero', 0)]
-    function = randomly_clean_room_scenario
-    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    # scenarios 11 -----------------------------------
-    scenario_id = 11
     name = "navigation into a corridor randomaly"
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomly_corridor_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    # scenarios 12 -----------------------------------
-    scenario_id = 12
+    # scenarios 10 -----------------------------------
+    scenario_id = 10
     name = "navigation into a corridor with stuffs randomaly"
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomly_stuff_corridor_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    # scenarios 13 -----------------------------------
-    scenario_id = 13
+    # scenarios 11 -----------------------------------
+    scenario_id = 11
     name = "navigation into a corridor with stuffs and obstacles randomaly"
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomly_obstacles_stuff_corridor_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 12 -----------------------------------
+    scenario_id = 12
+    name = "navigation into cans randomaly"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomly_cans_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 13 -----------------------------------
+    scenario_id = 13
+    name = "navigation into cans with obstacles randomaly"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomly_obstacle_cans_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
 
@@ -336,7 +344,6 @@ def init_scenarios():
 def import_dynamically(path):
     import sys
     sys.path.insert(0, path)
-
 
 init_scenarios()
 import_dynamically(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/")
