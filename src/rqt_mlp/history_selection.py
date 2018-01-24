@@ -21,7 +21,7 @@ class HistorySelection(QWidget):
         self.history_items[per_title] = pre
         self.history_items[glob_title] = glob
 
-        self._to_save_filename = []
+        self.saved_dir = []
 
         self.group_selected_items = dict()
         self.group_areas = dict()
@@ -299,7 +299,7 @@ class HistorySelection(QWidget):
         flag = flag & self.check_int(self.step.text(), 0, "Error in Step", "That's not a integer!")
         # TODO selected topic not empty
 
-        if self._to_save_filename == []:
+        if self.saved_dir == []:
             QMessageBox.about(self, "Save CSV", "Select path for saving")
             flag = False
         return flag
@@ -319,7 +319,7 @@ class HistorySelection(QWidget):
         with open(get_path() + 'logger_history.log', "w") as f:
             for topic in topics:
                 f.write(topic + "\n")
-        self.createTimeSeriesFeatures(self.files, self._to_save_filename, int(self.window.text()),
+        self.createTimeSeriesFeatures(self.files, self.saved_dir, int(self.window.text()),
                                       self.group_selected_items, int(self.step.text()))
 
     def onSaveClicked(self):
@@ -334,35 +334,32 @@ class HistorySelection(QWidget):
         # print current_directory
         # self._to_save_filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory,
         #                                                      self.tr('csv (*.csv)'))
-        self._to_save_filename = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         # if self._to_save_filename[0] != "":
         #     with open(filepath, "w") as f:
         #         f.write(self._to_save_filename[0])
-        if self._to_save_filename != "":
+        if self.saved_dir != "":
             with open(filepath, "w") as f:
-                f.write(self._to_save_filename)
+                f.write(self.saved_dir)
 
                 # handler = logging.FileHandler(filepath, mode='w')
                 # logger_topic.addHandler(handler)
                 # print self._to_save_filename[0]
                 # logger_topic.info()
-        self.save_path.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
+        # self.save_path.setText(get_corrent_file_name(self._to_save_filename[0], ".csv"))
+        self.save_path.setText(self.saved_dir)
 
-    def createTimeSeriesFeatures(self, files, to_save_filename, window, group_selected_items, step):
+
+    def createTimeSeriesFeatures(self, files, saved_dir, window, group_selected_items, step):
         import TimeSeriesFeatures as TS
-        to_save_filename = to_save_filename[0].encode('utf-8')
-        for i in range(0, len(files)):
-            if len(files) == 1:
-                i = -1
-            input_path = files[i]
-            output_path = get_corrent_file_name(to_save_filename, ".csv", i)
-            output_path = generate_csv_from_bag(output_path, input_path)
+        # saved_dir = saved_dir[0].encode('utf-8')
+        for input_path in files:
+            output_path = generate_csv_from_bag(saved_dir, input_path)
+            print "++++++++++++++++++++++++++ ", output_path
             print "in = %s out = %s " % (input_path, output_path)
             print "step = %s" % step
             ts = TS.TimeSeries(input_path, output_path, window, group_selected_items, step)
             ts.generate_time_series_features()
-            if len(files) == 1:
-                i = 0
         QMessageBox.about(self, "csv save", "csv was saved successfuly")
 
     def onButtonChooseCliked(self):
@@ -374,27 +371,36 @@ class HistorySelection(QWidget):
             if checkbox.text() in topics:
                 checkbox.setCheckState(Qt.Checked)
 
-def generate_csv_from_bag(output_path, input_path):
-    bag_split = output_path.split('/')
-    csv_split = input_path.split('/')
-    bag_split[len(bag_split) - 1] = "ts_" + csv_split[len(csv_split) - 1]
-    tmp =  reduce(lambda acc,curr: acc + "/" + curr , bag_split, "")
-    tmp = tmp[:-4] + ".csv"
-    return tmp
-  
-def get_corrent_file_name(filename, suffix, i=-1):
-    if filename == "":
-        return ""
-    file_suffix = filename[-len(suffix):]
-    if file_suffix == suffix and i >= 0:
-        ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
-    elif file_suffix != suffix and i >= 0:
-        ret = "%s_%s%s" % (filename, i, suffix)
-    elif file_suffix != suffix and i < 0:
-        ret = "%s%s" % (filename, suffix)
-    else:
-        ret = filename
-    return ret
+# def generate_csv_from_bag(output_path, input_path):
+#     bag_split = output_path.split('/')
+#     csv_split = input_path.split('/')
+#     bag_split[len(bag_split) - 1] = "ts_" + csv_split[len(csv_split) - 1]
+#     tmp =  reduce(lambda acc,curr: acc + "/" + curr , bag_split, "")
+#     tmp = tmp[:-4] + ".csv"
+#     return tmp
+
+def generate_csv_from_bag(saved_dir, input_path):
+    bag_split = input_path.split('/')
+    csv_path = saved_dir + "/ts_" + bag_split[len(bag_split) - 1]
+    csv_path = csv_path[:-4] + ".csv"
+    print saved_dir
+    print input_path
+    print csv_path
+    return csv_path
+
+# def get_corrent_file_name(filename, suffix, i=-1):
+#     if filename == "":
+#         return ""
+#     file_suffix = filename[-len(suffix):]
+#     if file_suffix == suffix and i >= 0:
+#         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
+#     elif file_suffix != suffix and i >= 0:
+#         ret = "%s_%s%s" % (filename, i, suffix)
+#     elif file_suffix != suffix and i < 0:
+#         ret = "%s%s" % (filename, suffix)
+#     else:
+#         ret = filename
+#     return ret
   
 def get_path():
   import inspect, os

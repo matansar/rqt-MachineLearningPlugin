@@ -280,13 +280,13 @@ class BagParser(QWidget):
             QMessageBox.about(self, "Error in Window Time", "time need to be smaller than: " + str(self.duration))
             return
         # filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory, self.tr('csv (*.csv)'))
-        filename = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         # if filename[0] != '':
         #     with open(filepath, "w") as f:
         #         f.write(filename[0])
-        if filename != '':
+        if saved_dir != '':
             with open(filepath, "w") as f:
-                f.write(filename)
+                f.write(saved_dir)
             topics = self.selected_bag_topics
             specific_features_selection = self.selected_specific_features
             general_features_selection = self.selected_general_features
@@ -303,40 +303,42 @@ class BagParser(QWidget):
                 df = ef.generate_features(bag_file)
                 if len(self.bag_files) == 1:
                     counter = -1
-                temp = get_corrent_file_name(filename[0], ".csv", counter)
-                temp = generate_csv_from_bag(temp, bag_file)
+                # temp = filename + "/" +
+                # temp = get_corrent_file_name(filename[0], ".csv", counter)
+                csv_path = generate_csv_from_bag(saved_dir, bag_file)
                 # temp = "%s_%s%s" % (filename[0],counter,".csv")
-                E.write_to_csv(temp, df)
+                E.write_to_csv(csv_path, df)
                 counter = counter + 1
             QMessageBox.about(self, "csv export", "csv was exported successfuly")
 
-def generate_csv_from_bag(csv_file, bag_file):
-    bag_split = csv_file.split('/')
-    csv_split = bag_file.split('/')
-    bag_split[len(bag_split) - 1] = csv_split[len(csv_split) - 1]
-    tmp =  reduce(lambda acc,curr: acc + "/" + curr , bag_split, "")
-    tmp = tmp[:-4] + ".csv"
-    return tmp
-    
-def get_corrent_file_name(filename, suffix, i = -1):
-    if filename == "":
-        return ""
-    file_suffix = filename[-len(suffix):]
-    # print file_suffix
-    if file_suffix == suffix and i >= 0:
-        ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
-    elif file_suffix != suffix and i >= 0:
-        ret = "%s_%s%s" % (filename, i, suffix)
-    elif file_suffix != suffix and i < 0:
-        ret = "%s%s" % (filename, suffix)
-    else:
-        ret = filename
-    return ret
-  
+def generate_csv_from_bag(saved_dir, input_path):
+    bag_split = input_path.split('/')
+    csv_path = saved_dir + "/" + bag_split[len(bag_split) - 1]
+    csv_path = csv_path[:-4] + ".csv"
+    print saved_dir
+    print input_path
+    print csv_path
+    return csv_path
+
+
+# def get_corrent_file_name(filename, suffix, i = -1):
+#     if filename == "":
+#         return ""
+#     file_suffix = filename[-len(suffix):]
+#     # print file_suffix
+#     if file_suffix == suffix and i >= 0:
+#         ret = "%s_%s%s" % (filename[:-len(suffix)], i, suffix)
+#     elif file_suffix != suffix and i >= 0:
+#         ret = "%s_%s%s" % (filename, i, suffix)
+#     elif file_suffix != suffix and i < 0:
+#         ret = "%s%s" % (filename, suffix)
+#     else:
+#         ret = filename
+#     return ret
+
 def get_path():
     import inspect, os
     import logging
     logging_file = os.path.dirname(
         os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/History_Choosing/"
     return logging_file
-  
