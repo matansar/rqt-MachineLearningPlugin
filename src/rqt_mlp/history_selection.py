@@ -332,11 +332,15 @@ class HistorySelection(QWidget):
         # print self.group_selected_items
         current_directory = self.get_current_opened_directory(filepath)
         # print current_directory
-        self._to_save_filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory,
-                                                             self.tr('csv (*.csv)'))
-        if self._to_save_filename[0] != "":
+        # self._to_save_filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory,
+        #                                                      self.tr('csv (*.csv)'))
+        self._to_save_filename = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        # if self._to_save_filename[0] != "":
+        #     with open(filepath, "w") as f:
+        #         f.write(self._to_save_filename[0])
+        if self._to_save_filename != "":
             with open(filepath, "w") as f:
-                f.write(self._to_save_filename[0])
+                f.write(self._to_save_filename)
 
                 # handler = logging.FileHandler(filepath, mode='w')
                 # logger_topic.addHandler(handler)
