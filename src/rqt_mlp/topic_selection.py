@@ -342,19 +342,15 @@ class TopicSelection(QWidget):
             if item:
                 for i in item:
                     self.selected_topics.append(i)
-        # print "-----" + str(self.selected_topics)
-
-        # Defined Logging
-        # handler = logging.FileHandler('/var/tmp/logger_topic.log', mode='a')
-        # logger_topic.addHandler(handler)
         topics = self.selected_topics
         with open(get_path() + 'logger_topic.log', "w") as f:
             for topic in topics:
                 f.write(topic + "\n")
         self.close()
-        if self.plp_filename != "":
-            from .plp import Plp
-            Plp(self.plp_filename)
+        # TBD - runing plp on shell on itself
+        # if self.plp_filename != "":
+        #     from .plp import Plp
+        #     Plp(self.plp_filename)
         self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
 
     def get_current_opened_directory(self, filepath):

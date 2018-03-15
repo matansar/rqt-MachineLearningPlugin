@@ -31,6 +31,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, goals, world = "", mapping
     # raw_input("Press Enter to continue...")
     time.sleep(random.uniform(15, 22))
     run_rviz()
+    #run_attacker()
     apply_diagnostic()
     apply_simulation(scen_obj, goals)
     #record_start(scen_obj)
@@ -48,6 +49,9 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, goals, world = "", mapping
   #rosbag_cmd = "rosnode kill " + record_node
   #subprocess.Popen(rosbag_cmd, shell=True)
   
+def run_attacker():
+    rviz = "roslaunch robotican_demos attacker.launch" #-d /home/lab/dwa.rviz"
+    subprocess.Popen(rviz, shell=True)
 
 def run_rviz():
     rviz = "rosrun rviz rviz" #-d /home/lab/dwa.rviz"
