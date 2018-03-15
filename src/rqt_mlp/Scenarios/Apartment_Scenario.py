@@ -27,6 +27,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, goals, world = "", mapping
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
+    apply_statistics()
     # raw_input("Press Enter to continue...")
     time.sleep(random.uniform(15, 22))
     run_rviz()
@@ -70,6 +71,12 @@ def logging_params(logging_msg):
     logger.addHandler(hdlr)
     logger.info(logging_msg)
 
+
+def apply_statistics():
+    enable_statistics = "rosparam set enable_statistics true"
+    subprocess.Popen(enable_statistics, shell=True)
+    #ros_profiler = "rosrun rosprofiler rosprofiler"    
+    #subprocess.Popen(ros_profiler, shell=True)
  
 next_goal = 1
 waiting = None

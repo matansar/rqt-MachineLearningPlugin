@@ -26,6 +26,7 @@ def Run_Scenario(scen_obj, source_x, source_y, angle, distance, world = "empty.w
     location = "x:=%s y:=%s Y:=%s" % (source_x, source_y, angle)
     launch_cmd = ros_launch + location
     subprocess.Popen(launch_cmd, shell=True)
+    apply_statistics()
     time.sleep(SLEEPING_TIME)
     subprocess.Popen(script, shell=True)
     #run_rviz()
@@ -44,9 +45,9 @@ def apply_diagnostic():
     
 def apply_statistics():
     enable_statistics = "rosparam set enable_statistics true"
-    ros_profiler = "rosrun rosprofiler rosprofiler"
+    #ros_profiler = "rosrun rosprofiler rosprofiler"
     subprocess.Popen(enable_statistics, shell=True)
-    subprocess.Popen(ros_profiler, shell=True)
+    #subprocess.Popen(ros_profiler, shell=True)
 
 def apply_simulation(scen_obj, distance):
     goal = "rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped \'{ header: { stamp: now, frame_id: \"/map\" }, " \

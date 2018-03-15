@@ -247,49 +247,49 @@ def get_topics_options():
 
 def create_scenarios():
     tmp_scenarios = {}
-    ## scenarios 1 -----------------------------------
-    #scenario_id = 1
-    #name = "walking without obstacles from specific source to specific destination"
-    ### param, label, condition
-    #params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than zero', 0)]
-    #function = source_destination_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    ## scenarios 2 -----------------------------------
-    #scenario_id = 2
-    #name = "walking randomly without obstacles from source to destination"
-    #params = [('number of simulations', 'greater than zero', 0)]
-    #function = randomaly_source_destionation_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    ## scenarios 3 -----------------------------------
-    #scenario_id = 3
-    #name = "walking with an obstacle from specific source to specific destination"
-    #params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND), ('distance', 'greater than 3', 3)]
-    #function = obstacle_source_destination_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    ## scenarios 4 -----------------------------------
-    #scenario_id = 4
-    #name = "walking randomly with an obstacle from source to destination"
-    #params = [('number of simulations', 'greater than zero', 0)]
-    #function = randomaly_obstacle_source_destination_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    ## scenarios 5 -----------------------------------
-    #scenario_id = 5
-    #name = "object identifying"
-    #params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than 3', 3)]
-    #function = object_identifying_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    ## scenarios 6 -----------------------------------
-    #scenario_id = 6
-    #name = "object identifying randomly"
-    #params = [('number of simulations', 'greater than zero', 0)]
-    #function = randomly_object_identifying_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
-    ## scenarios 7 -----------------------------------
-    #scenario_id = 7
-    #name = "navigation into an apartment"
-    #params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND)]
-    #function = apartment_scenario
-    #tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 1 -----------------------------------
+    scenario_id = 1
+    name = "walking without obstacles from specific source to specific destination"
+    ## param, label, condition
+    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than zero', 0)]
+    function = source_destination_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 2 -----------------------------------
+    scenario_id = 2
+    name = "walking randomly without obstacles from source to destination"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomaly_source_destionation_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 3 -----------------------------------
+    scenario_id = 3
+    name = "walking with an obstacle from specific source to specific destination"
+    params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND), ('distance', 'greater than 3', 3)]
+    function = obstacle_source_destination_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 4 -----------------------------------
+    scenario_id = 4
+    name = "walking randomly with an obstacle from source to destination"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomaly_obstacle_source_destination_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 5 -----------------------------------
+    scenario_id = 5
+    name = "object identifying"
+    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than 3', 3)]
+    function = object_identifying_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 6 -----------------------------------
+    scenario_id = 6
+    name = "object identifying randomly"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = randomly_object_identifying_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 7 -----------------------------------
+    scenario_id = 7
+    name = "navigation into an apartment"
+    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND)]
+    function = apartment_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 8 -----------------------------------
     scenario_id = 8
     name = "navigation into a building randomaly"
