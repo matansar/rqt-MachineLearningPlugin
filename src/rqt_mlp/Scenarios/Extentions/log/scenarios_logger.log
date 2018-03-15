@@ -182,3 +182,8 @@ source x = 0.0, source y = 0.0, angle = 0.0, distance = 7.0, world = empty.world
 2018-01-21 12:21:57,151 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 55.12
 2018-01-21 12:28:01,313 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 157.2
 2018-01-21 13:01:25,938 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 88.62
+2018-01-28 12:40:32,707 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 757.47
+2018-01-28 16:43:11,951 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 338.7
+2018-01-28 16:54:44,719 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 519.04
+2018-01-29 11:56:53,706 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 472.53
+2018-03-15 12:18:01,320 source x = 0.0, source y = 0.0, angle = 0.0, mapping = building.yaml, world = buildings/building.world, duration = 145.55
