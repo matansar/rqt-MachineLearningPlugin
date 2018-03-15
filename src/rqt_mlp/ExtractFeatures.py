@@ -13,7 +13,7 @@ general_features_options = dict(counter = '# of messages', max_consecutive = 'co
 
 # min_consecutive = 'mininum time between consecutive messages', 
 
-specific_features_options = dict(location_x = 'location x', location_y = 'location y', vel_linear_x = 'velocity linear x', vel_angular_z = 'velocity angular z', threads = '# of nodes\' threads', max_cpu_node = 'CPU maximun load by nodes', min_cpu_node = 'CPU minimum load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes',min_virt_mem = 'minimun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes',min_real_mem = 'minimum real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes', cpu_host = 'CPU host load infomation', mem_host = 'memory host information (aviability & usage)')
+specific_features_options = dict(joints = "joint states information", location_x = 'location x', location_y = 'location y', vel_linear_x = 'velocity linear x', vel_angular_z = 'velocity angular z', threads = '# of nodes\' threads', max_cpu_node = 'CPU maximun load by nodes', min_cpu_node = 'CPU minimum load by nodes', mean_cpu_node = 'CPU mean load by nodes', std_cpu_node = 'CPU standard deviation load by nodes', max_virt_mem = 'maximun virtual memory usage by nodes',min_virt_mem = 'minimun virtual memory usage by nodes', mean_virt_mem = 'mean virtual memory usage by nodes', std_virt_mem = 'standard deviation virtual memory usage by nodes', max_real_mem = 'maximun real memory usage by nodes',min_real_mem = 'minimum real memory usage by nodes', mean_real_mem = 'mean real memory usage by nodes', std_real_mem = 'standard deviation real memory usage by nodes', cpu_host = 'CPU host load infomation', mem_host = 'memory host information (aviability & usage)')
 
 def get_general_features_options():
   return general_features_options.values()
@@ -87,6 +87,8 @@ class ExtractFeatures:
     general_features = self.__get_general_features(bag, stime, etime)
     #print "\t2. extract nav_vel features..."
     nav_vel_features = self.__get_features_nav_vel(bag, stime, etime)
+    #ss
+    joints_features = self.__get_features_joints_info(bag, stime, etime)
     #print "\t3. extract feedback features..."
     mb_feedback_features = self.__get_features_move_base_feedback(bag, stime, etime)
     #print "\t4. extract node_diagnostic features..."
@@ -95,7 +97,7 @@ class ExtractFeatures:
     host_diagnostic_features = self.__get_features_host_diagnostic(bag, stime, etime)
     #print "\t6. extract statistics features..."
     statistics_features = self.__get_features_statistics(bag, stime, etime)
-    return general_features + nav_vel_features + mb_feedback_features + node_diagnostic_features + host_diagnostic_features + statistics_features
+    return general_features + nav_vel_features + joints_features + mb_feedback_features + node_diagnostic_features + host_diagnostic_features + statistics_features
         
   # General type - return the features in the same calling's order
   def __get_general_features(self, bag, stime, etime):
@@ -191,8 +193,17 @@ class ExtractFeatures:
       #max_mean_std_period = self.__get_max_mean_std_period(topic, topic_messages)
       #max_mean_std_age = self.__get_max_mean_std_age(topic, topic_messages)
     return topic_statistics
-    
+
   # Nav_vel - return the features in the same calling's order
+  def __get_features_joints_info(self, bag, stime, etime):
+    topic = '/joint_states'
+    ret = []
+    messages = list(bag.read_messages(start_time=rospy.Time.from_sec(stime), end_time=rospy.Time.from_sec(etime), topics=[topic]))
+    if (specific_features_options['joints'] in self.__specific_selection):
+      ret = self.__get_joint_states(messages)
+    return ret
+
+    # Nav_vel - return the features in the same calling's order
   def __get_features_nav_vel(self, bag, stime, etime):
     topic = '/nav_vel'
     ret = []
@@ -366,8 +377,34 @@ class ExtractFeatures:
     vel_z = msg.angular.z
     return vel_z
 
-
-# -------------------------------------------- features type 3 -------------------------------------------------------------------
+  # feature 21
+  def __get_joint_states(self, messages):
+    def trans(x):
+      inf = 10000000
+      if x == float('Inf'):
+        return inf
+      if x == -float('Inf'):
+        return -1 * inf
+      if x.__str__() == 'nan':
+        return inf * inf
+      if x.__str__() == '-nan':
+        return -1 * inf * inf
+      if x == float('NaN') or x == float('naN') or x == float('Nan') or x == float('nan'):
+        return inf * inf
+      if x == -float('NaN') or x == -float('naN') or x ==  -float('Nan') or x == -float('nan'):
+        return -1 * inf * inf
+      return x
+    names = ['head_pan_joint', 'head_tilt_joint', 'left_finger_joint', 'left_wheel_joint', 'right_finger_joint', 'right_wheel_joint', 'rotation1_joint', 'rotation2_joint', 'shoulder1_joint', 'shoulder2_joint', 'shoulder3_joint','torso_joint', 'wrist_joint']
+    info = ["position", "effort", "velocity"]
+    for inf in info:
+      for name in names:
+        self.__update_features_name("%s %s" % (name, inf))
+    if len(messages) < 1:
+      return [0] * (len(names) * len(info))
+    topic, msg, t = messages[-1]
+    ret = map(trans, list(msg.position + msg.effort + msg.velocity))
+    return ret
+    # -------------------------------------------- features type 3 -------------------------------------------------------------------
 
   #feature 30
   def __get_nodes_count_threads(self, node, messages):
