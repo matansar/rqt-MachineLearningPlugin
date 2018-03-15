@@ -450,13 +450,13 @@ class ExtractFeatures:
       ret.append(max([0] + virt_mems))
     if(specific_features_options['min_virt_mem'] in self.__specific_selection):
       self.__update_features_name("MinVirtMem(%s)" % node)      
-      ret.append(min([[sys.maxint]] + virt_mems))
+      ret.append(min([sys.maxint] + virt_mems)) #########################################################################
     if(specific_features_options['mean_virt_mem'] in self.__specific_selection):
       self.__update_features_name("MeanVirtMem(%s)" % node)
       ret.append(stat.mean(virt_mems)) if len(virt_mems) > 0 else ret.append(0)
     if(specific_features_options['std_virt_mem'] in self.__specific_selection):
       self.__update_features_name("StdVirtMem(%s)" % node)
-      ret.append(stat.stdev(virt_mems)) if len(virt_mems) > 1 else ret.append([sys.maxint])   
+      ret.append(stat.stdev(virt_mems)) if len(virt_mems) > 1 else ret.append(sys.maxint)   
     return ret
 
   #feature 33
