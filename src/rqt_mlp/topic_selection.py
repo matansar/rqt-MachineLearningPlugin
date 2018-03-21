@@ -66,6 +66,7 @@ class TopicSelection(QWidget):
         self.main_vlayout.addWidget(self.label1)
 
         scanarios = S.get_scenarios_options()
+        print scanarios
         self.scanarios_answer = scanarios
         self.map_answer = dict()
         # print scanarios

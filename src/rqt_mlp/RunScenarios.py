@@ -170,6 +170,8 @@ def randomly_obstacles_stuff_corridor_scenario(scn_obj, number_simulations):
     goals = Create_Goals.corridor_goals()
     raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff_obs.world", mapping="vert_corridor_stuff.yaml")
 
+def search_can_scenario(scn_obj, number_simulations):
+    pass
 
 
 # ------------------------------------------------
@@ -326,7 +328,14 @@ def create_scenarios():
     params = [('number of simulations', 'greater than zero', 0)]
     function = randomly_obstacle_cans_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 14 -----------------------------------
+    scenario_id = 14
+    name = "search can in the room"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = search_can_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
+
 
 
 def init_scenarios():
