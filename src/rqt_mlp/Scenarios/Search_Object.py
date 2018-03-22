@@ -3,14 +3,15 @@ import time
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
 
+SLEEPING_TIME = 15
+
 def Run_Scenario(scen_obj):
     time.sleep(10)
-    ros_launch = "roslaunch robotican_armadillo armadillo4.launch kinect2:=true softkinetic:=true  " \
-		 "gmapping:=true hector_slam:=true move_base:=true lidar:=true " \
-                 "world_name:=\"`rospack find robotican_common`/worlds/objects_on_table.world\" "
+    ros_launch = "roslaunch robotican_armadillo armadillo4.launch kinect2:=true softkinetic:=true gmapping:=true hector_slam:=true move_base:=true lidar:=true gazebo:=true world_name:=\"`rospack find robotican_common`/worlds/objects_on_table.world\""
     launch_cmd = ros_launch
     subprocess.Popen(launch_cmd, shell=True)
     apply_statistics()
+    time.sleep(SLEEPING_TIME)
     run_rviz()
     apply_diagnostic()
     scen_obj.generate_bag()

@@ -184,7 +184,9 @@ def randomly_obstacles_stuff_corridor_scenario(scn_obj, number_simulations):
 
 
 def search_can_scenario(scn_obj, number_simulations):
-    pass
+    import Randomaly_Search_Scenario as rss
+    create_restarting_file(scn_obj)
+    rss.Run_Scenario(scn_obj, number_simulations)
 
 
 # ------------------------------------------------
