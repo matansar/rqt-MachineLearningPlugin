@@ -5,9 +5,8 @@ import inspect, os
 
 NO_COND = -9999
 ## for randomlay
-scn_counter_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/tmp/scenarios_counter.tmp"
-
-
+scn_counter_path = os.path.dirname(
+    os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/Extentions/tmp/scenarios_counter.tmp"
 
 topics_directory = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/topics/"
 
@@ -17,8 +16,8 @@ class RunScenario:
 
     # selected_scenario = {id = "", params = {x: value_x}}
     def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics):
-	must_topics = ['/host_diagnostic', '/node_diagnostic', '/statistics', "/move_base/feedback"]
-        #must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
+        must_topics = ['/host_diagnostic', '/node_diagnostic', '/statistics', "/move_base/feedback"]
+        # must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
         self.__restart_flag = False
         self.__bag_obj = bag_obj
         self.__export_bag = export_bag
@@ -70,13 +69,12 @@ class RunScenario:
 
     def get_topics(self):
         return list(self.__selected_topics)
-        
+
     @staticmethod
     def __get_scenarios_params(scn_id):
         global scenarios
         print str(scenarios)
         return list(scenarios[scn_id]['params'])
-
 
 
 # ------------------------------------------------------------ scenarios ------------------------------------------------------------
@@ -85,24 +83,29 @@ def source_destination_scenario(scn_obj, source_x, source_y, angle, distance):
     import Source_Dest_Scenario as sds
     sds.Run_Scenario(scn_obj, source_x, source_y, angle, distance)
 
+
 def randomaly_source_destionation_scenario(scn_obj, number_simulations):
     import Randomaly_Source_Dest_Scenario as rsds
     create_restarting_file(scn_obj)
     # scn_obj.add_temporal_filename(number_simulations)
     rsds.Run_Scenario(scn_obj, number_simulations)
 
+
 def obstacle_source_destination_scenario(scn_obj, source_x, source_y, angle, distance):
     import Obstacle_Source_Dest_Scenario as osds
     osds.Run_Scenario(scn_obj, source_x, source_y, angle, distance)
+
 
 def randomaly_obstacle_source_destination_scenario(scn_obj, number_simulations):
     import Randomaly_Obstacle_Source_Dest_Scenario as rosds
     create_restarting_file(scn_obj)
     rosds.Run_Scenario(scn_obj, number_simulations)
 
+
 def object_identifying_scenario(scn_obj, source_x, source_y, angle, distance):
     import Dynamic_Object_Identifying as doi
     doi.Run_Scenario(scn_obj, source_x, source_y, angle, distance)
+
 
 def randomly_object_identifying_scenario(scn_obj, number_simulations):
     import Randomaly_Dynamic_Object_Identifying as rdoi
@@ -114,26 +117,30 @@ def apartment_scenario(scn_obj, source_x, source_y, angle):
     import Apartment_Scenario as aparts
     aparts.Run_Scenario(scn_obj, source_x, source_y, angle)
 
+
 def randomly_building_scenario(scn_obj, number_simulations):
     import Create_Goals
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.building_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals,  world = "buildings/building.world", mapping = "building.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="buildings/building.world", mapping="building.yaml")
+
 
 def randomly_obstacle_cans_scenario(scn_obj, number_simulations):
     import Create_Goals
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.cans_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world = "cans/cans_1_obs.world", mapping = "cans_1.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="cans/cans_1_obs.world", mapping="cans_1.yaml")
+
 
 def randomly_cans_scenario(scn_obj, number_simulations):
     import Create_Goals
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.cans_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world = "cans/cans_1.world", mapping = "cans_1.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="cans/cans_1.world", mapping="cans_1.yaml")
+
 
 # def randomly_clean_room_scenario(scn_obj, number_simulations):
 #     import Create_Goals
@@ -147,14 +154,18 @@ def randomly_corridor_scenario(scn_obj, number_simulations):
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.corridor_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor.world", mapping="vert_corridor.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor.world",
+                         mapping="vert_corridor.yaml")
+
 
 def randomly_stuff_corridor_scenario(scn_obj, number_simulations):
     import Create_Goals
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.corridor_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff.world", mapping="vert_corridor_stuff.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff.world",
+                         mapping="vert_corridor_stuff.yaml")
+
 
 # def randomly_obs_corridor_scenario(scn_obj, number_simulations):
 #     import Create_Goals
@@ -168,7 +179,9 @@ def randomly_obstacles_stuff_corridor_scenario(scn_obj, number_simulations):
     import Randomaly_Apartment_Scenario as raparts
     create_restarting_file(scn_obj)
     goals = Create_Goals.corridor_goals()
-    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff_obs.world", mapping="vert_corridor_stuff.yaml")
+    raparts.Run_Scenario(scn_obj, number_simulations, goals, world="corridor/vert_corridor_stuff_obs.world",
+                         mapping="vert_corridor_stuff.yaml")
+
 
 def search_can_scenario(scn_obj, number_simulations):
     pass
@@ -191,7 +204,7 @@ def create_restarting_file(scn_obj):
 
             # time.sleep(10)
             scn_obj.turn_on_restart_flag()
-	time.sleep(10)
+        time.sleep(10)
         (selected_scenario['params'])[first_key] = (selected_scenario['params'])[first_key] - 1
         # time.sleep(5)
         if os.path.exists(scn_counter_path):
@@ -205,7 +218,6 @@ def create_restarting_file(scn_obj):
             f.write(filename + '\n')
             f.write(str(scn_number) + '\n')
             f.write(str(selected_scenario))
-
 
 
 # ------------------------------------------------------------ private functions ------------------------------------------------------------
@@ -253,7 +265,8 @@ def create_scenarios():
     scenario_id = 1
     name = "walking without obstacles from specific source to specific destination"
     ## param, label, condition
-    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than zero', 0)]
+    params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND),
+              ('distance', 'greater than zero', 0)]
     function = source_destination_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 2 -----------------------------------
@@ -265,7 +278,8 @@ def create_scenarios():
     # scenarios 3 -----------------------------------
     scenario_id = 3
     name = "walking with an obstacle from specific source to specific destination"
-    params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND), ('distance', 'greater than 3', 3)]
+    params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND),
+              ('distance', 'greater than 3', 3)]
     function = obstacle_source_destination_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 4 -----------------------------------
@@ -277,7 +291,8 @@ def create_scenarios():
     # scenarios 5 -----------------------------------
     scenario_id = 5
     name = "object identifying"
-    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND), ('distance', 'greater than 3', 3)]
+    params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND),
+              ('distance', 'greater than 3', 3)]
     function = object_identifying_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 6 -----------------------------------
@@ -289,7 +304,7 @@ def create_scenarios():
     # scenarios 7 -----------------------------------
     scenario_id = 7
     name = "navigation into an apartment"
-    params = [('source x','', NO_COND), ('source y','', NO_COND), ('angle (rad)','', NO_COND)]
+    params = [('source x', '', NO_COND), ('source y', '', NO_COND), ('angle (rad)', '', NO_COND)]
     function = apartment_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 8 -----------------------------------
@@ -337,7 +352,6 @@ def create_scenarios():
     return tmp_scenarios
 
 
-
 def init_scenarios():
     global scenarios
     tmp_scenarios = create_scenarios()
@@ -349,10 +363,12 @@ def init_scenarios():
         (tmp_scenarios[scn_id])['params'] = new_params
     scenarios = tmp_scenarios
 
+
 # to import dynamically a py_file from another directory
 def import_dynamically(path):
     import sys
     sys.path.insert(0, path)
+
 
 init_scenarios()
 import_dynamically(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/Scenarios/")
