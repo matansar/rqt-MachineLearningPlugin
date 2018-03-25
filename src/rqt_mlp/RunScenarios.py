@@ -347,7 +347,7 @@ def create_scenarios():
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     # scenarios 14 -----------------------------------
     scenario_id = 14
-    name = "search can in the room"
+    name = "search object in the room"
     params = [('number of simulations', 'greater than zero', 0)]
     function = search_can_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)

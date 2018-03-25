@@ -1,7 +1,7 @@
 import subprocess
 import time
+import rospy
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseStamped
 
 SLEEPING_TIME = 15
 
@@ -14,6 +14,7 @@ def Run_Scenario(scen_obj):
     time.sleep(SLEEPING_TIME)
     run_rviz()
     apply_diagnostic()
+    apply_simulation(scen_obj)
     scen_obj.generate_bag()
 
 
@@ -30,4 +31,33 @@ def run_rviz():
 def apply_diagnostic():
     ros_profiler = "rosrun rosdiagnostic rosdiagnostic"
     subprocess.Popen(ros_profiler, shell=True)
+
+
+def when_found(msg, scen_obj):
+  if msg.data == "find object":
+    scen_obj.close_bag()
+    print "shut down"
+
+
+def publising_goals(scen_obj):
+  import time
+  rospy.Subscriber('/robot_state', String, when_found, scen_obj)
+  msg = "t"
+  time.sleep(2)
+  publish(msg)
+
+
+def publish(msg):
+  goal = "rostopic pub /robot_state std_msgs/String " + msg
+  subprocess.Popen(goal, shell=True)
+  print "Published" #: " + str(msg)
+
+def apply_simulation(scen_obj):
+    import time
+    print "simulation started..."
+    time.sleep(10)
+    ros_run = "roslaunch robotican_demos_upgrade demo.launch"
+    subprocess.Popen(ros_run, shell=True)
+    time.sleep(10)
+    publising_goals(scen_obj)
 
