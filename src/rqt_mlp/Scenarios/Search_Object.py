@@ -3,10 +3,9 @@ import time
 import rospy
 from std_msgs.msg import String
 
-SLEEPING_TIME = 15
+SLEEPING_TIME = 10
 
 def Run_Scenario(scen_obj):
-    time.sleep(10)
     ros_launch = "roslaunch robotican_armadillo armadillo4.launch kinect2:=true softkinetic:=true gmapping:=true hector_slam:=true move_base:=true lidar:=true gazebo:=true world_name:=\"`rospack find robotican_common`/worlds/objects_on_table.world\""
     launch_cmd = ros_launch
     subprocess.Popen(launch_cmd, shell=True)
@@ -40,10 +39,8 @@ def when_found(msg, scen_obj):
 
 
 def publising_goals(scen_obj):
-  import time
   rospy.Subscriber('/robot_state', String, when_found, scen_obj)
   msg = "t"
-  time.sleep(2)
   publish(msg)
 
 
@@ -58,6 +55,6 @@ def apply_simulation(scen_obj):
     time.sleep(10)
     ros_run = "roslaunch robotican_demos_upgrade demo.launch"
     subprocess.Popen(ros_run, shell=True)
-    time.sleep(10)
+    time.sleep(7)
     publising_goals(scen_obj)
 
