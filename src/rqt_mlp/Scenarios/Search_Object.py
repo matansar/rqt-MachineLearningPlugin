@@ -49,6 +49,7 @@ def publish(msg):
   subprocess.Popen(goal, shell=True)
   print "Published" #: " + str(msg)
 
+
 def apply_simulation(scen_obj):
     import time
     print "simulation started..."
@@ -57,4 +58,8 @@ def apply_simulation(scen_obj):
     subprocess.Popen(ros_run, shell=True)
     time.sleep(7)
     publising_goals(scen_obj)
+
+def run_attacker():
+    rviz = "roslaunch robotican_demos_upgrade attacker.launch"
+    subprocess.Popen(rviz, shell=True)
 
