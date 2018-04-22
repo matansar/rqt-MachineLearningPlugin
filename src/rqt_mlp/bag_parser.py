@@ -269,46 +269,49 @@ class BagParser(QWidget):
         import inspect, os
         filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_csv.log"
         current_directory = self.get_current_opened_directory(filepath)
-        window = self.window.text()
-        try:
-            val = float(window)
-        except ValueError:
-            QMessageBox.about(self, "Error in Window Time", "That's not a number!")
-            return
-        if val >= self.duration:
-            QMessageBox.about(self, "Error in Window Time", "time need to be smaller than: " + str(self.duration))
-            return
-        # filename = QFileDialog.getSaveFileName(self, self.tr('csv File'), current_directory, self.tr('csv (*.csv)'))
+        windows = self.window.text().split(",")
+        print windows
         saved_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory", current_directory))
-        # if filename[0] != '':
-        #     with open(filepath, "w") as f:
-        #         f.write(filename[0])
-        if saved_dir != '':
-            with open(filepath, "w") as f:
-                f.write(saved_dir)
-            topics = self.selected_bag_topics
-            specific_features_selection = self.selected_specific_features
-            general_features_selection = self.selected_general_features
-            with open(get_path() + 'logger.log', "w") as f:
-                for topic in topics:
-                    f.write(topic + "\n")
-                for topic1 in specific_features_selection:
-                    f.write(topic1 + "\n")
-                for topic2 in general_features_selection:
-                    f.write(topic2 + "\n")
-            ef = E.ExtractFeatures(topics, float(window), specific_features_selection, general_features_selection)
-            counter = 0
-            for bag_file in self.bag_files:
-                df = ef.generate_features(bag_file)
-                if len(self.bag_files) == 1:
-                    counter = -1
-                # temp = filename + "/" +
-                # temp = get_corrent_file_name(filename[0], ".csv", counter)
-                csv_path = generate_csv_from_bag(saved_dir, bag_file)
-                # temp = "%s_%s%s" % (filename[0],counter,".csv")
-                E.write_to_csv(csv_path, df)
-                counter = counter + 1
-            QMessageBox.about(self, "csv export", "csv was exported successfuly")
+        for item in windows:
+            new_dir = saved_dir + "/" + item
+            print new_dir
+            if not os.path.exists(new_dir):
+                os.makedirs(new_dir)
+            print str(item)
+            try:
+                val = float(item)
+            except ValueError:
+                QMessageBox.about(self, "Error in Window Time", "That's not a number!")
+                return
+            if val >= self.duration:
+                QMessageBox.about(self, "Error in Window Time", "time need to be smaller than: " + str(self.duration))
+                continue
+            if new_dir != '':
+                with open(filepath, "w") as f:
+                    f.write(new_dir)
+                topics = self.selected_bag_topics
+                specific_features_selection = self.selected_specific_features
+                general_features_selection = self.selected_general_features
+                with open(get_path() + 'logger.log', "w") as f:
+                    for topic in topics:
+                        f.write(topic + "\n")
+                    for topic1 in specific_features_selection:
+                        f.write(topic1 + "\n")
+                    for topic2 in general_features_selection:
+                        f.write(topic2 + "\n")
+                ef = E.ExtractFeatures(topics, float(item), specific_features_selection, general_features_selection)
+                counter = 0
+                for bag_file in self.bag_files:
+                    df = ef.generate_features(bag_file)
+                    if len(self.bag_files) == 1:
+                        counter = -1
+                    # temp = filename + "/" +
+                    # temp = get_corrent_file_name(filename[0], ".csv", counter)
+                    csv_path = generate_csv_from_bag(new_dir, bag_file)
+                    # temp = "%s_%s%s" % (filename[0],counter,".csv")
+                    E.write_to_csv(csv_path, df)
+                    counter = counter + 1
+        QMessageBox.about(self, "csv export", "csv was exported successfuly")
 
 def generate_csv_from_bag(saved_dir, input_path):
     bag_split = input_path.split('/')
