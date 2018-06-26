@@ -54,8 +54,18 @@ class RunScenario:
         operator = (scenarios[scn_id])['function']
         operator(*operands)
 
+    def get_topics_list(self):
+        return self.__selected_topics
+
     def generate_bag(self):
-        self.__bag_obj.record_bag(self.__export_bag, False, self.__selected_topics)
+        # self.__bag_obj.record_bag(self.__export_bag, False, self.__selected_topics)
+        import subprocess
+        goal1 = "rosbag record -O " + self.__export_bag
+        for item in self.__selected_topics:
+            goal1 += " " + item
+        # goal1 += " --split --duration=15"
+        print goal1
+        subprocess.Popen(goal1, shell=True)
 
     def close_bag(self):
         # path = ""

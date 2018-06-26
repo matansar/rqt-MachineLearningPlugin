@@ -5,6 +5,7 @@ from std_msgs.msg import String
 
 SLEEPING_TIME = 10
 
+
 def Run_Scenario(scen_obj):
     ros_launch = "roslaunch robotican_armadillo armadillo4.launch kinect2:=true softkinetic:=true gmapping:=true hector_slam:=true move_base:=true lidar:=true gazebo:=true world_name:=\"`rospack find robotican_common`/worlds/objects_on_table.world\""
     launch_cmd = ros_launch
@@ -13,6 +14,8 @@ def Run_Scenario(scen_obj):
     time.sleep(SLEEPING_TIME)
     run_rviz()
     apply_diagnostic()
+    # topics = scen_obj.get_topics_list()
+    # apply_simulation(scen_obj, topics)
     apply_simulation(scen_obj)
     scen_obj.generate_bag()
 
@@ -47,7 +50,7 @@ def publising_goals(scen_obj):
 def publish(msg):
   goal = "rostopic pub /robot_state std_msgs/String " + msg
   subprocess.Popen(goal, shell=True)
-  print "Published" #: " + str(msg)
+  print "Published"  #: " + str(msg)
 
 
 def apply_simulation(scen_obj):
@@ -56,7 +59,13 @@ def apply_simulation(scen_obj):
     time.sleep(10)
     ros_run = "roslaunch robotican_demos_upgrade demo.launch"
     subprocess.Popen(ros_run, shell=True)
-    time.sleep(7)
+    # time.sleep(1.6)
+    # goal1 = "rosbag record -O sub"
+    # for item in topics:
+    #     goal1 += " " + item
+    # # goal1 += " --split --duration=15"
+    # print goal1
+    # subprocess.Popen(goal1, shell=True)
     publising_goals(scen_obj)
 
 def run_attacker():
