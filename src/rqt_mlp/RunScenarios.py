@@ -2,6 +2,7 @@
 ## Phase 1
 
 import inspect, os
+from plugins.Analyzer import Analyzer
 
 NO_COND = -9999
 ## for randomlay
@@ -15,7 +16,7 @@ class RunScenario:
     # ------------------------------------------------------------ constructor ------------------------------------------------------------
 
     # selected_scenario = {id = "", params = {x: value_x}}
-    def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics):
+    def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold):
         must_topics = ['/host_diagnostic', '/node_diagnostic', '/statistics', "/move_base/feedback"]
         # must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
         self.__restart_flag = False
@@ -23,6 +24,9 @@ class RunScenario:
         self.__export_bag = export_bag
         self.__selected_scenario = selected_scenario
         self.__selected_topics = list(set(selected_topics + must_topics))
+        self.__is_online_simulation = is_online_simulation
+        self.__time_interval = time_interval
+        self.__threshold = threshold
 
     # ------------------------------------------------------------ getters ------------------------------------------------------------
 
@@ -63,9 +67,20 @@ class RunScenario:
         goal1 = "rosbag record -O " + self.__export_bag
         for item in self.__selected_topics:
             goal1 += " " + item
-        # goal1 += " --split --duration=15"
+        if self.__is_online_simulation:
+            goal1 += " --split --duration=" + str(self.__time_interval)
+            dir_path = os.path.dirname(os.path.realpath(self.__export_bag))
         print goal1
         subprocess.Popen(goal1, shell=True)
+        if self.__is_online_simulation:
+            analyzer = Analyzer(dir_path, self.__time_interval, self.__threshold, self.__selected_topics)
+            import threading
+            t = threading.Thread(target=analyzer.analyze(), args=())
+            t.daemon = True
+            t.start()
+        print "##################### opened recorder ####################"
+
+
 
     def close_bag(self):
         # path = ""

@@ -14,7 +14,7 @@ import logging
 # logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
-    recordSettingsSelected = Signal(bool, list, dict)
+    recordSettingsSelected = Signal(bool, list, dict, bool, float, int)
 
     def __init__(self):
         super(TopicSelection, self).__init__()
@@ -116,6 +116,16 @@ class TopicSelection(QWidget):
 
         self.ok_button = QPushButton("Record", self)
         self.ok_button.clicked.connect(self.onButtonClicked)
+
+        self.online_button = QPushButton("Record Online", self)
+        self.online_button.clicked.connect(self.onRecordButtonClicked)
+
+        self.interval_length = QLineEdit(self)
+        self.interval_length.setText("3")
+
+        self.threshold = QLineEdit(self)
+        self.threshold.setText("2")
+
         self.ok_button.setEnabled(False)
         self.choose_button = QPushButton("Get Last Export Choose", self)
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
@@ -139,6 +149,10 @@ class TopicSelection(QWidget):
         # self.main_vlayout.addWidget(self.area)
         # self.main_vlayout.addWidget(self.choose_button)
         self.main_vlayout.addWidget(self.ok_button)
+        self.main_vlayout.addWidget(self.online_button)
+        self.main_vlayout.addWidget(self.interval_length)
+        self.main_vlayout.addWidget(self.threshold)
+
         # self.main_vlayout.addWidget(self.from_nodes_button)
         self.setLayout(self.main_vlayout)
 
@@ -351,7 +365,20 @@ class TopicSelection(QWidget):
         # if self.plp_filename != "":
         #     from .plp import Plp
         #     Plp(self.plp_filename)
-        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer)
+        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, False, float(self.interval_length.text()), int(self.threshold.text()))
+
+    def onRecordButtonClicked(self):
+        for item in self.group_selected_items.values():
+            if item:
+                for i in item:
+                    self.selected_topics.append(i)
+        topics = self.selected_topics
+        with open(get_path() + 'logger_topic.log', "w") as f:
+            for topic in topics:
+                f.write(topic + "\n")
+        self.close()
+        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, True, float(self.interval_length.text()), int(self.threshold.text()))
+
 
     def get_current_opened_directory(self, filepath):
         import os
