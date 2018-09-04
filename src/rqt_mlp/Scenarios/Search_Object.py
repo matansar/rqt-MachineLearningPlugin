@@ -7,12 +7,12 @@ SLEEPING_TIME = 10
 
 
 def Run_Scenario(scen_obj):
-    ros_launch = "roslaunch robotican_armadillo armadillo4.launch kinect2:=true softkinetic:=true gmapping:=true hector_slam:=true move_base:=true lidar:=true gazebo:=true world_name:=\"`rospack find robotican_common`/worlds/objects_on_table.world\""
+    ros_launch = "roslaunch robotican_armadillo armadillo4.launch kinect2:=true gmapping:=true hector_slam:=true move_base:=true lidar:=true gazebo:=true world_name:=\"`rospack find robotican_common`/worlds/objects_on_table1.world\""
     launch_cmd = ros_launch
     subprocess.Popen(launch_cmd, shell=True)
     apply_statistics()
     time.sleep(SLEEPING_TIME)
-    run_rviz()
+    #run_rviz()
     apply_diagnostic()
     # topics = scen_obj.get_topics_list()
     # apply_simulation(scen_obj, topics)
@@ -36,7 +36,7 @@ def apply_diagnostic():
 
 
 def when_found(msg, scen_obj):
-  if msg.data == "find object":
+  if msg.data == "find object" or msg.data == "not find object":
     scen_obj.close_bag()
     print "shut down"
 
@@ -57,7 +57,7 @@ def apply_simulation(scen_obj):
     import time
     print "simulation started..."
     time.sleep(10)
-    ros_run = "roslaunch robotican_demos_upgrade demo.launch"
+    ros_run = "roslaunch robotican_demos_upgrade demo_new.launch"
     subprocess.Popen(ros_run, shell=True)
     # time.sleep(1.6)
     # goal1 = "rosbag record -O sub"

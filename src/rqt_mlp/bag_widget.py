@@ -141,7 +141,7 @@ class BagWidget(QWidget):
             # time.sleep(10)
                 with open(get_path() + "logger_topic.log", 'r') as f:
                     topics = f.read().splitlines()
-                self.start_recording(record_filename, selected_scenario, topics)
+                self.start_recording(record_filename, selected_scenario, topics, False, 0, 0)
         except IOError:
             return
 
@@ -277,7 +277,7 @@ class BagWidget(QWidget):
                 direc = pathes.rsplit('/', 1)[0]
         return direc
 
-    def _on_record_settings_selected(self, all_topics, selected_topics, selected_scenario, is_online_simulation, time_interval, threshold):
+    def _on_record_settings_selected(self, all_topics, selected_topics, selected_scenario, is_online_simulation, time_interval, threshold, rule_filename):
         # TODO verify master is still running
         import inspect
         filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_record.log"
@@ -298,14 +298,14 @@ class BagWidget(QWidget):
             #     record_filename = prefix
 
             rospy.loginfo('Recording to %s.' % record_filename)
-            self.start_recording(record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold)
+            self.start_recording(record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename)
 
-    def start_recording(self, record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold):
+    def start_recording(self, record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename):
         self._timeline.setBagWidget(self)
 
         # self.load_button.setEnabled(False)
         self._recording = True
-        self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold)
+        self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename)
         self.run_scen.run_record_scenario()
 
         self.load_button.setEnabled(False)

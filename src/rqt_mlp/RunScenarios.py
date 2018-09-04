@@ -16,7 +16,7 @@ class RunScenario:
     # ------------------------------------------------------------ constructor ------------------------------------------------------------
 
     # selected_scenario = {id = "", params = {x: value_x}}
-    def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold):
+    def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename):
         must_topics = ['/host_diagnostic', '/node_diagnostic', '/statistics', "/move_base/feedback"]
         # must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
         self.__restart_flag = False
@@ -27,6 +27,7 @@ class RunScenario:
         self.__is_online_simulation = is_online_simulation
         self.__time_interval = time_interval
         self.__threshold = threshold
+        self.__rule_filename = rule_filename
 
     # ------------------------------------------------------------ getters ------------------------------------------------------------
 
@@ -69,11 +70,11 @@ class RunScenario:
             goal1 += " " + item
         if self.__is_online_simulation:
             goal1 += " --split --duration=" + str(self.__time_interval)
-            dir_path = os.path.dirname(os.path.realpath(self.__export_bag))
         print goal1
         subprocess.Popen(goal1, shell=True)
         if self.__is_online_simulation:
-            analyzer = Analyzer(dir_path, self.__time_interval, self.__threshold, self.__selected_topics)
+            dir_path = os.path.dirname(os.path.realpath(self.__export_bag))
+            analyzer = Analyzer(dir_path, self.__time_interval, self.__threshold, self.__selected_topics, self.__rule_filename)
             import threading
             t = threading.Thread(target=analyzer.analyze(), args=())
             t.daemon = True

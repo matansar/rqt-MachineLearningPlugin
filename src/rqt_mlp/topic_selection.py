@@ -14,7 +14,7 @@ import logging
 # logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
-    recordSettingsSelected = Signal(bool, list, dict, bool, float, int)
+    recordSettingsSelected = Signal(bool, list, dict, bool, float, int, str)
 
     def __init__(self):
         super(TopicSelection, self).__init__()
@@ -30,6 +30,7 @@ class TopicSelection(QWidget):
         keys = all_topics.keys()
         # print all_topics.keys()[0]
         self.plp_filename = ""
+        self.rule_filename = ""
         self.group_selected_items = dict()
         self.group_areas = dict()
         self.group_main_widget = dict()
@@ -120,8 +121,16 @@ class TopicSelection(QWidget):
         self.online_button = QPushButton("Record Online", self)
         self.online_button.clicked.connect(self.onRecordButtonClicked)
 
+        self.two_buttons2 = QHBoxLayout(self)
+
         self.interval_length = QLineEdit(self)
         self.interval_length.setText("3")
+
+        self.label5 = QLabel("interval length:", self)
+
+        self.two_buttons2.addWidget(self.label5)
+
+        self.two_buttons2.addWidget(self.interval_length)
 
         self.threshold = QLineEdit(self)
         self.threshold.setText("2")
@@ -150,8 +159,23 @@ class TopicSelection(QWidget):
         # self.main_vlayout.addWidget(self.choose_button)
         self.main_vlayout.addWidget(self.ok_button)
         self.main_vlayout.addWidget(self.online_button)
-        self.main_vlayout.addWidget(self.interval_length)
+
+        self.main_vlayout.addLayout(self.two_buttons2)
+
         self.main_vlayout.addWidget(self.threshold)
+
+        self.rule_button = QPushButton("Select Rules File...", self)
+        self.rule_button.clicked.connect(self.onRuleClicked)
+
+        self.select_path1 = QLineEdit()
+
+        self.two_buttons4 = QHBoxLayout(self)
+
+        self.two_buttons4.addWidget(self.rule_button)
+
+        self.two_buttons4.addWidget(self.select_path1)
+
+        self.main_vlayout.addLayout(self.two_buttons4)
 
         # self.main_vlayout.addWidget(self.from_nodes_button)
         self.setLayout(self.main_vlayout)
@@ -365,7 +389,7 @@ class TopicSelection(QWidget):
         # if self.plp_filename != "":
         #     from .plp import Plp
         #     Plp(self.plp_filename)
-        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, False, float(self.interval_length.text()), int(self.threshold.text()))
+        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, False, float(self.interval_length.text()), int(self.threshold.text()), "")
 
     def onRecordButtonClicked(self):
         for item in self.group_selected_items.values():
@@ -377,7 +401,7 @@ class TopicSelection(QWidget):
             for topic in topics:
                 f.write(topic + "\n")
         self.close()
-        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, True, float(self.interval_length.text()), int(self.threshold.text()))
+        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, True, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename)
 
 
     def get_current_opened_directory(self, filepath):
@@ -404,6 +428,17 @@ class TopicSelection(QWidget):
             self.select_path.setText(self.plp_filename)
             # print self.plp_filename[0]
 
+    def onRuleClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_rule.log"
+        current_directory = self.get_current_opened_directory(filepath)
+        fd = QFileDialog(self)
+        wc = "json files {.json} (*.json)"
+        # print current_directory
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.json'), directory=current_directory)
+        if len(filename):
+            self.rule_filename = filename[0]
+            self.select_path1.setText(self.rule_filename)
 
     def onFromNodesButtonClicked(self):
         self.node_selection = NodeSelection(self)
