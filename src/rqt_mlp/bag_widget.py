@@ -141,7 +141,7 @@ class BagWidget(QWidget):
             # time.sleep(10)
                 with open(get_path() + "logger_topic.log", 'r') as f:
                     topics = f.read().splitlines()
-                self.start_recording(record_filename, selected_scenario, topics, False, 0, 0)
+                self.start_recording(record_filename, selected_scenario, topics, False, 0, 0, "")
         except IOError:
             return
 

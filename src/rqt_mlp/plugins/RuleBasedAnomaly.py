@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy
 from Style import Style, Configure
 
 ROWS_INDEX = 0
@@ -148,7 +149,6 @@ class RuleBasedAnomaly:
             dig = self.cols_digits[col_i]
             rules_learned_digit = rules[col_i][method_name]
             prediction.append(self.__column_checker_on_testing(dataset, [col_i], lambda x: self.__digit(x) == dig and self.__digit(x) == rules_learned_digit))
-            print "ok"
         prediction = self.__intersection_labeling(*prediction)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
@@ -260,6 +260,10 @@ class RuleBasedAnomaly:
         for _, row in dataset.iterrows():
             label = Conf.POSITIVE_LABEL
             for col_i in map_values.keys():
+                if isinstance(row[col_i], numpy.float64) and row[col_i] > 9999999999999999:
+                    row[col_i] = float('{:0.11e}'.format(row[col_i]))
+                if row[col_i] == 9.2233720368499999e+18:
+                    continue
                 if not self.is_rule_considered(rules, col_i, method):
                     continue
                 if not (row[col_i] in rules[col_i][method]):
