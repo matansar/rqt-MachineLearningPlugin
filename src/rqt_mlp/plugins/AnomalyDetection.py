@@ -19,14 +19,25 @@ def apply_rba(dataset, rules):
     rba = RBA.RuleBasedAnomaly()
     rba.fit([dataset], percentage=0.01, coverage=0.98)
     type = Conf.TRAINING
-    # new_datasets = []
-    pred = rba.transform_same_digits_number(type, dataset, rules)
-    pred = intersection_labeling(pred, rba.transform_positive_values(type, dataset, rules))
-    pred = intersection_labeling(pred, rba.transform_negative_values(type, dataset, rules))
-    pred = intersection_labeling(pred, rba.transform_not_negative_values(type, dataset, rules))
-    pred = intersection_labeling(pred, rba.transform_coverage_percentage_columns(type, dataset, rules))
-    pred = intersection_labeling(pred, rba.transform_corresponding_columns(type, dataset))
-    pred = intersection_labeling(pred, rba.transform_exactly_one_value(type, dataset, rules))
-    # removable_cols = rba.get_removable_columns()
-    # new_datasets.append(DS.Datasets.remove_columns(dataset, removable_cols))
+    #new_datasets = []
+
+    rules_functions= [rba.transform_same_digits_number, rba.transform_positive_values,
+                  rba.transform_negative_values, rba.transform_not_negative_values,
+                  rba.transform_coverage_percentage_columns, rba.transform_exactly_one_value]
+    pred = 1
+    for rule_function in rules_functions:
+        pred = rule_function(type, dataset, rules)
+        if pred[0] == 0:
+            print "Failed on {0}".format(rule_function.__name__)
+            break
+
+    # pred = rba.transform_same_digits_number(type, dataset, rules)
+    # pred = intersection_labeling(pred, rba.transform_positive_values(type, dataset, rules))
+    # pred = intersection_labeling(pred, rba.transform_negative_values(type, dataset, rules))
+    # pred = intersection_labeling(pred, rba.transform_not_negative_values(type, dataset, rules))
+    # pred = intersection_labeling(pred, rba.transform_coverage_percentage_columns(type, dataset, rules))
+    # #pred = intersection_labeling(pred, rba.transform_corresponding_columns(type, dataset))
+    # pred = intersection_labeling(pred, rba.transform_exactly_one_value(type, dataset, rules))
+    # # removable_cols = rba.get_removable_columns()
+    # #new_datasets.append(DS.Datasets.remove_columns(dataset, removable_cols))
     return pred

@@ -42,13 +42,13 @@ def when_found(msg, scen_obj):
 
 
 def publising_goals(scen_obj):
-  rospy.Subscriber('/robot_state', String, when_found, scen_obj)
+  rospy.Subscriber('/plp/trigger', String, when_found, scen_obj)
   msg = "t"
   publish(msg)
 
 
 def publish(msg):
-  goal = "rostopic pub /robot_state std_msgs/String " + msg
+  goal = "rostopic pub /plp/trigger std_msgs/String " + msg
   subprocess.Popen(goal, shell=True)
   print "Published"  #: " + str(msg)
 
@@ -57,7 +57,8 @@ def apply_simulation(scen_obj):
     import time
     print "simulation started..."
     time.sleep(10)
-    ros_run = "roslaunch robotican_demos_upgrade demo_new.launch"
+    #ros_run = "roslaunch robotican_demos_upgrade demo_new.launch"
+    ros_run = "roslaunch robotican_demos_upgrade demo1.launch"
     subprocess.Popen(ros_run, shell=True)
     # time.sleep(1.6)
     # goal1 = "rosbag record -O sub"

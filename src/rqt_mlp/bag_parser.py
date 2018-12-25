@@ -223,6 +223,8 @@ class BagParser(QWidget):
             else:
                 self.ok_button.setEnabled(False)
 
+        self.window.setText(str(len(self.selected_bag_topics)))
+
         # if self.selected_bag_topics != []:
         #     if self.selected_specific_features == [] and self.selected_general_features == []:
         #         self.ok_button.setEnabled(False)

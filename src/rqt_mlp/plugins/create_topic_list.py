@@ -15,5 +15,6 @@ with open("topics.txt","w") as f:
         # print is_larger_than_1MB
         if not is_larger_than_1MB:
             f.write(item+"\n")
+            print item
 print "done!"
 
