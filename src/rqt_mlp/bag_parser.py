@@ -60,6 +60,9 @@ class BagParser(QWidget):
         self.label1 = QLabel("Select topic from bag(s)", self)
         self.label1.setAlignment(Qt.AlignCenter)
 
+        self.label6 = QLabel("", self)
+        self.label6.setAlignment(Qt.AlignCenter)
+
         self.label2 = QLabel("Statistics Features", self)
         self.label2.setAlignment(Qt.AlignCenter)
 
@@ -74,6 +77,7 @@ class BagParser(QWidget):
         self.main_vlayout = QVBoxLayout(self)
         # self.main_vlayout = QGridLayout(self)
         self.main_vlayout.addWidget(self.label1)
+        self.main_vlayout.addWidget(self.label6)
         self.main_vlayout.addWidget(self.area)
         self.main_vlayout.addWidget(self.label2)
         self.main_vlayout.addWidget(self.areagen)
@@ -223,7 +227,8 @@ class BagParser(QWidget):
             else:
                 self.ok_button.setEnabled(False)
 
-        self.window.setText(str(len(self.selected_bag_topics)))
+        # self.window.setText(str(len(self.selected_bag_topics)))
+        self.label6.setText("Number of chosen topics: " + str(len(self.selected_bag_topics)))
 
         # if self.selected_bag_topics != []:
         #     if self.selected_specific_features == [] and self.selected_general_features == []:
@@ -294,6 +299,8 @@ class BagParser(QWidget):
                 topics = self.selected_bag_topics
                 specific_features_selection = self.selected_specific_features
                 general_features_selection = self.selected_general_features
+                with open(get_path() + 'topic_online.log', "w") as f:
+                    f.write(str(topics))
                 with open(get_path() + 'logger.log', "w") as f:
                     for topic in topics:
                         f.write(topic + "\n")

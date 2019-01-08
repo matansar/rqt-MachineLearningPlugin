@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 ## Phase 2
 
-#from __future__ import print_function
 import rosbag
 import rospy
-import time
 import pandas as pd
 
 options = None

@@ -34,22 +34,52 @@ class RuleBasedAnomaly:
         self.percentage = None
         self.coverage = None
 
-    def fit(self, trainings, percentage, coverage):
+    def fit(self, rules):
 
-        self.percentage = percentage
-        self.coverage = coverage
-        self.training = pd.concat(trainings, ignore_index=True)
+        self.cols_digits = self.get_value_by_topic(rules, "same digits number")
 
-        self.cols_digits = self.__count_digits(self.training)  # map <col,size>
-        # print self.cols_digits
-        self.pos_columns = self.__column_checker(self.training, lambda x: x > 0)
-        self.neg_columns = self.__column_checker(self.training, lambda x: x < 0)
-        self.not_neg_columns = self.__column_checker(self.training, lambda x: x >= 0)
-        self.one_value_columns = self.__helper_K_possible_values_by_percentage(self.training, coverage=1, percentage=1)  # map <col, value>
-        self.cov_percen_columns = self.__helper_K_possible_values_by_percentage(self.training, coverage=coverage, percentage=percentage)
+        self.pos_columns = self.get_list_by_topic(rules, "positive values")
 
-        self.corr_columns = self.__corresponding_columns(self.training)
-        self.min_max_values = self.__calculate_min_max_columns_values(self.training)  # map<col,<min,max> >
+        self.neg_columns = self.get_list_by_topic(rules, "negative values")
+        self.not_neg_columns = self.get_list_by_topic(rules, "not negative values")
+
+
+        self.one_value_columns = self.get_value_by_topic(rules, "exactly one")
+        self.cov_percen_columns = self.get_value_by_topic(rules, "coverage percentage columns")
+        #
+        self.corr_columns = self.get_corr_topics(rules, "corresponding columns")
+        # self.min_max_values = self.__calculate_min_max_columns_values(self.training)  # map<col,<min,max> >
+        # print self.pos_columns
+
+    def get_value_by_topic(self, rules, key):
+        ret = {}
+        for val in rules.keys():
+            for key_val in rules[val].keys():
+                if key_val == key:
+                    result = {}
+                    result = rules[val][key_val]
+                    ret[val.encode("utf-8")] = result
+        return ret
+
+    def get_list_by_topic(self, rules, key):
+        topic_list = []
+        for val in rules.keys():
+            for key_val in rules[val].keys():
+                if key_val == key:
+                    topic_list.append(val.encode("utf-8"))
+        return topic_list
+
+    def get_corr_topics(self, rules, key):
+        ret = {}
+        for val in rules.keys():
+            for key_val in rules[val].keys():
+                if key_val == key:
+                    for key_val_inside in rules[val][key_val].keys():
+                        re = {}
+                        for key_val_inside_result in rules[val][key_val][key_val_inside].keys():
+                            re[key_val_inside_result.encode("utf-8")] = rules[val][key_val][key_val_inside][key_val_inside_result]
+                        ret[(val.encode("utf-8"), key_val_inside.encode("utf-8"))] = re
+        return ret
 
     def learnt_rules_anount(self):
         ans = ""
@@ -112,6 +142,32 @@ class RuleBasedAnomaly:
             removable_cols.add(col_i)
         return list(removable_cols)
 
+    # def transform_corresponding_columns(self, type, dataset, rules):
+    #     method_name = "corresponding columns"
+    #     labeling = []
+    #     def corr(multi_columns, row, col_i, col_j):
+    #         values = multi_columns[(col_i, col_j)]
+    #         for val_i in values:
+    #             val_j = values[val_i]
+    #             if row[col_i] == val_i and row[col_j] != val_j:
+    #                 return False
+    #         return True
+    #     prediction = []
+    #     for _, row in dataset.iterrows():
+    #         pred = Conf.POSITIVE_LABEL
+    #         for (col_i,col_j) in self.corr_columns:
+    #             if not corr(self.corr_columns, row, col_i, col_j):
+    #                 pred = Conf.NEGATIVE_LABEL
+    #                 if not col_i in rules[col_i][method_name]:
+    #                     labeling.append(Conf.NEGATIVE_LABEL)
+    #                 break
+    #             else:
+    #                 labeling.append(Conf.POSITIVE_LABEL)
+    #         prediction.append(pred)
+    #     self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+    #     print "Corresponding results : " + labeling
+    #     return prediction
+
     def transform_corresponding_columns(self, type, dataset):
         method_name = "corresponding columns"
         def corr(multi_columns, row, col_i, col_j):
@@ -127,6 +183,8 @@ class RuleBasedAnomaly:
             for (col_i,col_j) in self.corr_columns:
                 if not corr(self.corr_columns, row, col_i, col_j):
                     pred = Conf.NEGATIVE_LABEL
+                    # if type == "negatives":
+                    # print method_name + "\t" + str(col_i) + "\t" + str(row[col_i])
                     break
             prediction.append(pred)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
@@ -137,53 +195,67 @@ class RuleBasedAnomaly:
         return feature in rules and method_name in rules[feature]
 
     # our transform returns new_dataset and its values
-    def transform_same_digits_number(self, type, dataset, rules):
+    # def transform_same_digits_number(self, type, dataset, rules):
+    #     '''
+    # checks foreach column if its values must contain V digits
+    # '''
+    #     method_name = "same digits number"
+    #     prediction = [[Conf.POSITIVE_LABEL] * len(dataset)]
+    #     for col_i in self.cols_digits.keys():
+    #         if not self.is_rule_considered(rules, col_i, method_name):
+    #             continue
+    #         dig = self.cols_digits[col_i]
+    #         rules_learned_digit = rules[col_i][method_name]
+    #         prediction.append(self.__column_checker_on_testing(dataset, [col_i], lambda x: self.__digit(x) == dig and self.__digit(x) == rules_learned_digit))
+    #     prediction = self.__intersection_labeling(*prediction)
+    #     self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+    #     print prediction
+    #     return prediction
+
+    # our transform returns new_dataset and its values
+    def transform_same_digits_number(self, type, dataset):
         '''
     checks foreach column if its values must contain V digits
     '''
         method_name = "same digits number"
         prediction = [[Conf.POSITIVE_LABEL] * len(dataset)]
         for col_i in self.cols_digits.keys():
-            if not self.is_rule_considered(rules, col_i, method_name):
-                continue
             dig = self.cols_digits[col_i]
-            rules_learned_digit = rules[col_i][method_name]
-            prediction.append(self.__column_checker_on_testing(dataset, [col_i], lambda x: self.__digit(x) == dig and self.__digit(x) == rules_learned_digit))
+            prediction.append(self.__column_checker_on_testing(dataset, [col_i], lambda x: self.__digit(x) == dig))
         prediction = self.__intersection_labeling(*prediction)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
-        print prediction
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         return prediction
 
-    def transform_positive_values(self, type, dataset, rules):
+    def transform_positive_values(self, type, dataset):
         method_name = "positive values"
-        pos_prediction = self.__column_checker_on_testing(dataset, self.pos_columns, lambda x: x > 0, method_name, rules)
+        pos_prediction = self.__column_checker_on_testing(dataset, self.pos_columns, lambda x: x > 0)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(pos_prediction))
         return pos_prediction
 
-    def transform_negative_values(self, type, dataset, rules):
+    def transform_negative_values(self, type, dataset):
         method_name = "negative values"
-        neg_prediction = self.__column_checker_on_testing(dataset, self.neg_columns, lambda x: x < 0, method_name, rules)
+        neg_prediction = self.__column_checker_on_testing(dataset, self.neg_columns, lambda x: x < 0)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(neg_prediction))
         print neg_prediction
         return neg_prediction
 
-    def transform_not_negative_values(self, type, dataset, rules):
+    def transform_not_negative_values(self, type, dataset):
         method_name = "not negative values"
-        no_neg_prediction = self.__column_checker_on_testing(dataset, self.not_neg_columns, lambda x: x >= 0, method_name, rules)
+        no_neg_prediction = self.__column_checker_on_testing(dataset, self.not_neg_columns, lambda x: x >= 0)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(no_neg_prediction))
         print no_neg_prediction
         return no_neg_prediction
 
-    def transform_exactly_one_value(self, type, dataset, rules):
+    def transform_exactly_one_value(self, type, dataset):
         method_name = "exactly one"
-        prediction = self.__checking_columns_values(dataset, self.one_value_columns, method_name, rules)
+        prediction = self.__checking_columns_values(dataset, self.one_value_columns)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
 
-    def transform_coverage_percentage_columns(self, type, dataset, rules):
+    def transform_coverage_percentage_columns(self, type, dataset):
         method_name = "coverage percentage columns"
-        prediction = self.__checking_columns_values(dataset, self.cov_percen_columns, method_name, rules)
+        prediction = self.__checking_columns_values(dataset, self.cov_percen_columns)
         self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
@@ -251,7 +323,12 @@ class RuleBasedAnomaly:
                 ret[col_i] = uniques
         return ret
 
-    def __checking_columns_values(self, dataset, map_values, method, rules):
+    def __canonicalize_scientific_number(self, number):
+        if  number > 9999999999999999: #isinstance(number, numpy.float64) and
+            number = float('{:0.5e}'.format(number))
+        return number
+
+    def  __checking_columns_values(self, dataset, map_values):
         '''
     return dataset's labels according to map_values
     if the columns are the same values as @map_values.
@@ -260,18 +337,42 @@ class RuleBasedAnomaly:
         for _, row in dataset.iterrows():
             label = Conf.POSITIVE_LABEL
             for col_i in map_values.keys():
-                if isinstance(row[col_i], numpy.float64) and row[col_i] > 9999999999999999:
-                    row[col_i] = float('{:0.11e}'.format(row[col_i]))
-                if row[col_i] == 9.2233720368499999e+18:
-                    continue
-                if not self.is_rule_considered(rules, col_i, method):
-                    continue
-                if not (row[col_i] in rules[col_i][method]):
+                row[col_i] = self.__canonicalize_scientific_number(row[col_i])
+                if not (row[col_i] in map_values[col_i]):
+                    # if not "/rosout" in col_i:
                     label = Conf.NEGATIVE_LABEL
+                    # if type == "negatives":
+                    # print method_name + "\t" + str(col_i) + "\t" + str(row[col_i]) + "\t not in " + str(map_values[col_i])
                     break
-
             ret.append(label)
         return ret
+
+    # "/rosout" and "/twist_mux"
+
+    # def __checking_columns_values(self, dataset, map_values, method, rules):
+    #     '''
+    #         return dataset's labels according to map_values
+    #         if the columns are the same values as @map_values.
+    #     '''
+    #     ret = []
+    #     for _, row in dataset.iterrows():
+    #         label = Conf.POSITIVE_LABEL
+    #         for col_i in map_values.keys():
+    #             if isinstance(row[col_i], numpy.float64) and row[col_i] > 9999999999999999:
+    #                 row[col_i] = self.__canonicalize_scientific_number(row[col_i])
+    #             # if row[col_i] == 9.2233720368499999e+18:
+    #             #     continue
+    #             if not self.is_rule_considered(rules, col_i, method):
+    #                 continue
+    #             canonical_column = [self.__canonicalize_scientific_number(val) for val in rules[col_i][method]]
+    #             # for index in xrange(len(rules[col_i][method])):
+    #             #     rules[col_i][method][index] = self.__canonicalize_scientific_number(rules[col_i][method][index])
+    #             if not (row[col_i] in canonical_column):
+    #                 label = Conf.NEGATIVE_LABEL
+    #                 break
+    #
+    #         ret.append(label)
+    #     return ret
 
     def __column_checker(self, dataset, predicate):
         '''
@@ -289,25 +390,39 @@ class RuleBasedAnomaly:
         return columns
 
 
-    def __column_checker_on_testing(self, dataset, columns, predicate, method_name="", rules=""):
+    # def __column_checker_on_testing(self, dataset, columns, predicate, method_name="", rules=""):
+    #     '''
+    # checks that the following @columns setisfy the predicate
+    # '''
+    #     # topic = ""
+    #     labeling = []
+    #     for _, row in dataset.iterrows():
+    #         pred = Conf.POSITIVE_LABEL
+    #         last_col = None
+    #         for col_i in columns:
+    #             if rules != "" and not self.is_rule_considered(rules, col_i, method_name):
+    #                 break
+    #             if not predicate(row[col_i]):
+    #                 pred = Conf.NEGATIVE_LABEL
+    #             elif rules != "":
+    #                 pred = pred * rules[col_i][method_name]
+    #
+    #         labeling.append(pred)
+    #     # print str(topic) + ": " + str(labeling)
+    #     return labeling
+
+    def __column_checker_on_testing(self, dataset, columns, predicate):
         '''
     checks that the following @columns setisfy the predicate
     '''
-        # topic = ""
         labeling = []
         for _, row in dataset.iterrows():
             pred = Conf.POSITIVE_LABEL
-            last_col = None
             for col_i in columns:
-                if rules != "" and not self.is_rule_considered(rules, col_i, method_name):
-                    break
                 if not predicate(row[col_i]):
+                    print str(col_i) + " " + str(row[col_i])
                     pred = Conf.NEGATIVE_LABEL
-                elif rules != "":
-                    pred = pred * rules[col_i][method_name]
-
             labeling.append(pred)
-        # print str(topic) + ": " + str(labeling)
         return labeling
 
     def __count_digits(self, dataset):

@@ -61,6 +61,11 @@ class TopicSelection(QWidget):
             self.group_main_widget[group_name].setLayout(self.group_selection_vlayout[group_name])
             self.group_areas[group_name].setWidget(self.group_main_widget[group_name])
 
+        self.label2 = QLabel("", self)
+        self.label2.setAlignment(Qt.AlignCenter)
+
+        self.main_vlayout.addWidget(self.label2)
+
         self.label1 = QLabel("Scenarios", self)
         self.label1.setAlignment(Qt.AlignCenter)
 
@@ -351,6 +356,12 @@ class TopicSelection(QWidget):
         #if self.item_all.checkState() == Qt.Checked:
         #    self.item_all.setCheckState(Qt.PartiallyChecked)
 
+        temp_selected_topics = []
+        for item in self.group_selected_items.values():
+            if item:
+                for i in item:
+                    temp_selected_topics.append(i)
+        self.label2.setText("Number of chosen topics: " + str(len(temp_selected_topics)))
         self.enable_record()
 
     def enable_record(self):

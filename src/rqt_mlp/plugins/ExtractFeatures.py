@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 ## Phase 2
 
-# from __future__ import print_function
 import rosbag
 import rospy
-import time
 import pandas as pd
 
 options = None
@@ -87,13 +85,19 @@ class ExtractFeatures:
         df = pd.DataFrame()
         bag = rosbag.Bag(bag_file)
         stime = bag.get_start_time()  # represented by float
-        etime = bag.get_end_time()  # represented by float
+        # etime = bag.get_end_time()  # represented by float
+        # stime, etime = float(int(stime*100))/100, float(int(etime*100))/100
+        # if stime + self.__window <= etime:
+        #     pass
+        # else:
+        #     stime, etime = stime - 0.01, etime + 0.01
+        #stime, etime = stime-0.01, etime+0.01
         print("--------- Extract Features on %s..." % (bag_file))
-        while (stime + self.__window <= etime):
+        #while (stime + self.__window <= etime + 0.01):
             # print("stime = %s | etime = %s" % (stime , stime + self.__window))
-            features = self.__get_features(bag, stime, stime + self.__window)
-            df = df.append([features])
-            stime = stime + self.__window
+        features = self.__get_features(bag, stime, stime + self.__window)
+        df = df.append([features])
+        # stime = stime + self.__window
         print("Finished!")
         bag.close()
         df.columns = self.__features_name
@@ -275,6 +279,16 @@ class ExtractFeatures:
             if ex_node in node:
                 return False;
         return True;
+
+    # def __get_consecutive_times(self, messages):
+    #     consecutive_times = []
+    #     for (_, _, t1), (_, _, t2) in zip(messages[:-1], messages[1:]):
+    #         t1 = self.__to_seconds(t1)
+    #         t2 = self.__to_seconds(t2)
+    #         diff = t2-t1
+    #         diff = float(int(diff*100))/100
+    #         consecutive_times.append(diff)
+    #     return consecutive_times
 
     def __get_consecutive_times(self, messages):
         consecutive_times = []

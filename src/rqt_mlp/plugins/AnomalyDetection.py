@@ -17,16 +17,17 @@ def intersection_labeling(labeling, *labelings):
 
 def apply_rba(dataset, rules):
     rba = RBA.RuleBasedAnomaly()
-    rba.fit([dataset], percentage=0.01, coverage=0.98)
+    rba.fit(rules)
     type = Conf.TRAINING
     #new_datasets = []
 
-    rules_functions= [rba.transform_same_digits_number, rba.transform_positive_values,
-                  rba.transform_negative_values, rba.transform_not_negative_values,
-                  rba.transform_coverage_percentage_columns, rba.transform_exactly_one_value]
+    rules_functions= [rba.transform_coverage_percentage_columns]
+        # [rba.transform_same_digits_number
+        #           rba.transform_negative_values, rba.transform_not_negative_values,
+        #           rba.transform_coverage_percentage_columns, rba.transform_exactly_one_value,rba.transform_corresponding_columns]
     pred = 1
     for rule_function in rules_functions:
-        pred = rule_function(type, dataset, rules)
+        pred = rule_function(type, dataset)
         if pred[0] == 0:
             print "Failed on {0}".format(rule_function.__name__)
             break
