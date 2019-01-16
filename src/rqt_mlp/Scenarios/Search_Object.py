@@ -17,13 +17,24 @@ def Run_Scenario(scen_obj):
     # topics = scen_obj.get_topics_list()
     # apply_simulation(scen_obj, topics)
     apply_simulation(scen_obj)
-    scen_obj.generate_bag()
+    # time.sleep(3)
+    calc_bw(scen_obj.generate_bag())
 
 
 def apply_statistics():
     enable_statistics = "rosparam set enable_statistics true"
     subprocess.Popen(enable_statistics, shell=True)
 
+def calc_bw(action_id):
+    # print "print" + str(action_id)
+    # with open("result.txt", "w") as f:
+    #     f.write(str(action_id))
+    if action_id == 1:
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        print filepath
+        create_topic_list = "python " + filepath + "/create_topic_list.py"
+        subprocess.Popen(create_topic_list, shell=True)
 
 def run_rviz():
     rviz = "rosrun rviz rviz"

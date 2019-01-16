@@ -14,7 +14,7 @@ import logging
 # logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
-    recordSettingsSelected = Signal(bool, list, dict, bool, float, int, str)
+    recordSettingsSelected = Signal(list, dict, int, float, int, str)
 
     def __init__(self):
         super(TopicSelection, self).__init__()
@@ -26,8 +26,9 @@ class TopicSelection(QWidget):
         glob = TS.get_global_time_series_features_options()
         # print pre
         # print glob
-        all_topics = S.get_topics_options()
-        keys = all_topics.keys()
+        # self.all_topics = S.get_topics_options()
+        self.all_topics = []
+        # keys = self.all_topics.keys()
         # print all_topics.keys()[0]
         self.plp_filename = ""
         self.rule_filename = ""
@@ -44,22 +45,7 @@ class TopicSelection(QWidget):
         self.selected_topics = []
         self.items_list = []
 
-        for group_name in all_topics:
-            self.group_selected_items[group_name] = []
-            self.group_areas[group_name] = QScrollArea(self)
-            self.group_main_widget[group_name] = QWidget(self.group_areas[group_name])
-            self.group_label[group_name] = QLabel(group_name, self)
-            self.group_label[group_name].setAlignment(Qt.AlignCenter)
-            self.main_vlayout.addWidget(self.group_label[group_name])
-            self.main_vlayout.addWidget(self.group_areas[group_name])
-            self.group_selection_vlayout[group_name] = QVBoxLayout(self)
-            self.group_item_all[group_name] = MyQCheckBox("All", self, self.group_selection_vlayout[group_name], None)
-            self.MakeCheckBoxList(self.group_selection_vlayout[group_name],
-                                  self.group_selected_items[group_name],
-                                  all_topics[group_name],
-                                  self.group_item_all[group_name])
-            self.group_main_widget[group_name].setLayout(self.group_selection_vlayout[group_name])
-            self.group_areas[group_name].setWidget(self.group_main_widget[group_name])
+        self.make_topic_list()
 
         self.label2 = QLabel("", self)
         self.label2.setAlignment(Qt.AlignCenter)
@@ -100,6 +86,15 @@ class TopicSelection(QWidget):
 
         self.select_path.setEnabled(False)
         self.save_path.setEnabled(False)
+
+        self.clear_topic_button = QPushButton("Clear Topics List", self)
+        self.clear_topic_button.clicked.connect(self.onClearTopicClicked)
+
+        self.topic_button = QPushButton("Generate Topics List", self)
+        self.topic_button.clicked.connect(self.onTopicsClicked)
+
+        self.main_vlayout.addWidget(self.topic_button)
+        self.main_vlayout.addWidget(self.clear_topic_button)
 
         self.plp_button = QPushButton("Select PLP Python File...", self)
         self.plp_button.clicked.connect(self.onPlpClicked)
@@ -202,6 +197,25 @@ class TopicSelection(QWidget):
         # print S.get_scenarios_options()
 
         self.show()
+
+    def make_topic_list(self):
+        self.all_topics = S.get_topics_options()
+        for group_name in self.all_topics:
+            self.group_selected_items[group_name] = []
+            self.group_areas[group_name] = QScrollArea(self)
+            self.group_main_widget[group_name] = QWidget(self.group_areas[group_name])
+            self.group_label[group_name] = QLabel(group_name + " - " + str(len(self.all_topics[group_name])), self)
+            self.group_label[group_name].setAlignment(Qt.AlignCenter)
+            self.main_vlayout.addWidget(self.group_label[group_name])
+            self.main_vlayout.addWidget(self.group_areas[group_name])
+            self.group_selection_vlayout[group_name] = QVBoxLayout(self)
+            self.group_item_all[group_name] = MyQCheckBox("All", self, self.group_selection_vlayout[group_name], None)
+            self.MakeCheckBoxList(self.group_selection_vlayout[group_name],
+                                  self.group_selected_items[group_name],
+                                  self.all_topics[group_name],
+                                  self.group_item_all[group_name])
+            self.group_main_widget[group_name].setLayout(self.group_selection_vlayout[group_name])
+            self.group_areas[group_name].setWidget(self.group_main_widget[group_name])
 
     def onClearClicked(self):
         self.clearTopicCheckState()
@@ -400,7 +414,7 @@ class TopicSelection(QWidget):
         # if self.plp_filename != "":
         #     from .plp import Plp
         #     Plp(self.plp_filename)
-        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, False, float(self.interval_length.text()), int(self.threshold.text()), "")
+        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 2, float(self.interval_length.text()), int(self.threshold.text()), "")
 
     def onRecordButtonClicked(self):
         for item in self.group_selected_items.values():
@@ -412,7 +426,7 @@ class TopicSelection(QWidget):
             for topic in topics:
                 f.write(topic + "\n")
         self.close()
-        self.recordSettingsSelected.emit(False, self.selected_topics, self.map_answer, True, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename)
+        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 3, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename)
 
 
     def get_current_opened_directory(self, filepath):
@@ -438,6 +452,17 @@ class TopicSelection(QWidget):
                 f.write(self.plp_filename)
             self.select_path.setText(self.plp_filename)
             # print self.plp_filename[0]
+
+    def onTopicsClicked(self):
+        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 1, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename)
+
+    def onClearTopicClicked(self):
+        import os, inspect
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/topics/topics.txt"
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        else:
+            print("The file does not exist")
 
     def onRuleClicked(self):
         import inspect, os

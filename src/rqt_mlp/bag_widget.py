@@ -141,7 +141,7 @@ class BagWidget(QWidget):
             # time.sleep(10)
                 with open(get_path() + "logger_topic.log", 'r') as f:
                     topics = f.read().splitlines()
-                self.start_recording(record_filename, selected_scenario, topics, False, 0, 0, "")
+                self.start_recording(record_filename, selected_scenario, topics, 2, 0, 0, "")
         except IOError:
             return
 
@@ -252,7 +252,7 @@ class BagWidget(QWidget):
 
     def apply_restart(self, reindex_bag):
         import inspect, subprocess
-        # subprocess.Popen("rosbag reindex \"%s\" && rm \"%s\"" % (reindex_bag, reindex_bag[:-4] + ".orig.bag"), shell=True) # for reindexing
+        ## subprocess.Popen("rosbag reindex \"%s\" && rm \"%s\"" % (reindex_bag, reindex_bag[:-4] + ".orig.bag"), shell=True) # for reindexing
         subprocess.Popen("rosbag reindex \"%s\" && rm \"%s\" && mv \"%s\" \"%s\"" % (reindex_bag+".active", reindex_bag + ".orig.active", reindex_bag + ".active", reindex_bag),
                          shell=True)  # for reindexing
 
@@ -277,45 +277,44 @@ class BagWidget(QWidget):
                 direc = pathes.rsplit('/', 1)[0]
         return direc
 
-    def _on_record_settings_selected(self, all_topics, selected_topics, selected_scenario, is_online_simulation, time_interval, threshold, rule_filename):
-        # TODO verify master is still running
-        import inspect
-        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_record.log"
-        current_directory = self.get_current_opened_directory(filepath)
-        filename = QFileDialog.getSaveFileName(self, self.tr('Select prefix for new Bag File'), current_directory,
-                                               self.tr('Bag files {.bag} (*.bag)'))
-        if filename[0] != '':
-            with open(filepath, "w") as f:
-                f.write(filename[0])
-            record_filename = filename[0].strip()
-            if not record_filename.endswith('.bag'):
-                record_filename = record_filename + ".bag"
-            # # Get filename to record to
-            # record_filename = time.strftime('%Y-%m-%d-%H-%M-%S.bag', time.localtime(time.time()))
-            # if prefix.endswith('.bag'):
-            #     prefix = prefix[:-len('.bag')]
-            # if prefix:
-            #     record_filename = prefix
+    def _on_record_settings_selected(self, selected_topics, selected_scenario, action_id, time_interval, threshold, rule_filename):
+        record_filename = ""
+        if action_id != 1:
+            # TODO verify master is still running
+            import inspect
+            filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_record.log"
+            current_directory = self.get_current_opened_directory(filepath)
+            filename = QFileDialog.getSaveFileName(self, self.tr('Select prefix for new Bag File'), current_directory,
+                                                   self.tr('Bag files {.bag} (*.bag)'))
+            if filename[0] != '':
+                with open(filepath, "w") as f:
+                    f.write(filename[0])
+                record_filename = filename[0].strip()
+                if not record_filename.endswith('.bag'):
+                    record_filename = record_filename + ".bag"
 
-            rospy.loginfo('Recording to %s.' % record_filename)
-            self.start_recording(record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename)
+                rospy.loginfo('Recording to %s.' % record_filename)
+                self.start_recording(record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+        else:
+            self.start_recording(record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
 
-    def start_recording(self, record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename):
-        self._timeline.setBagWidget(self)
+    def start_recording(self, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename):
+        if action_id != 1:
+            self._timeline.setBagWidget(self)
 
-        # self.load_button.setEnabled(False)
-        self._recording = True
-        self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, is_online_simulation, time_interval, threshold, rule_filename)
-        self.run_scen.run_record_scenario()
+            self._recording = True
+            self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+            self.run_scen.run_record_scenario()
 
-        self.load_button.setEnabled(False)
-        self.history_button.setEnabled(False)
-        self.restart_button.setEnabled(True)
+            self.load_button.setEnabled(False)
+            self.history_button.setEnabled(False)
+            self.restart_button.setEnabled(True)
 
-        # selected_topics.append("/cmd_vel")
-        # self._timeline.record_bag(record_filename, all_topics, selected_topics)
-        self.record_button.setToolTip("Pause")
-        self.record_button.setIcon(QIcon.fromTheme('media-playback-pause'))
+            self.record_button.setToolTip("Pause")
+            self.record_button.setIcon(QIcon.fromTheme('media-playback-pause'))
+        else:
+            self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+            self.run_scen.run_record_scenario()
 
     def get_current_opened_directory(self, filepath):
         direc = "/"

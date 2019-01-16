@@ -406,7 +406,7 @@ def _rostopic_bw(topic, window_size=-1):
     sub = rospy.Subscriber(real_topic, rospy.AnyMsg, rt.callback)
     # print("subscribed to [%s]" % real_topic)
     # while not rospy.is_shutdown():
-    _sleep(1.0)
+    _sleep(3.0)
     return rt.print_bw()
 
 
