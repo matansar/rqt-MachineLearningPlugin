@@ -308,6 +308,9 @@ class BagParser(QWidget):
                         f.write(topic1 + "\n")
                     for topic2 in general_features_selection:
                         f.write(topic2 + "\n")
+                with open(get_path() + 'csv_topics.txt', "w") as f:
+                    for topic in topics:
+                        f.write(topic + "\n")
                 ef = E.ExtractFeatures(topics, float(item), specific_features_selection, general_features_selection)
                 counter = 0
                 for bag_file in self.bag_files:

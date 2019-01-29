@@ -2,11 +2,14 @@ import os
 import glob
 import json
 import time
+import logging
 
 from ExtractFeatures import *
 # from AnomalyDetection import *
 import RuleBasedAnomaly as RBA
 from Style import Configure as Conf
+
+logger = logging.getLogger("Analyzer")
 
 class Analyzer(object):
 
@@ -24,6 +27,12 @@ class Analyzer(object):
         self.rba = {}
         self.stop = True
         self.old_predictions = []
+
+        # Defined Logging
+        hdlr = logging.FileHandler('/var/tmp/analyzer.log')
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        hdlr.setFormatter(formatter)
+        logger.addHandler(hdlr)
 
     """
         Return a list of .bag files sorted by creation time
@@ -59,6 +68,7 @@ class Analyzer(object):
         if df.empty:
             return
         print "#######################Testing the following file : {0}#######################".format(file)
+        logger.info("#######################Testing the following file : {0}#######################".format(file))
         df = df.reset_index(drop=True)
         #if not self.processed_files:
         # try:
@@ -73,9 +83,13 @@ class Analyzer(object):
             self.predictions += prediction
         except Exception as e:
             print "################### Exception message : {0} ###############".format(str(e))
+            logger.warning("################### Exception message : {0} ###############".format(str(e)))
         print "################ Prediction : {0} ################".format(prediction)
+        logger.info("################ Prediction : {0} ################".format(prediction))
         print "################ All predictions : {0} ################".format(self.predictions)
+        logger.info("################ All predictions : {0} ################".format(self.predictions))
         print "################ Longest invalid prediction : {0} ################".format(self.get_longest_invalid_seq_length())
+        logger.info("################ Longest invalid prediction : {0} ################".format(self.get_longest_invalid_seq_length()))
 
     def apply_rba(self, rba, dataset, rules):
         type = Conf.TRAINING
@@ -156,6 +170,7 @@ class Analyzer(object):
                 self.old_predictions.append(self.predictions)
                 self.predictions = []
                 print "A feature vector longer than the threshold was found, stopping the current execution. Predictions : {0}".format(self.predictions)
+                logger.info("A feature vector longer than the threshold was found, stopping the current execution. Predictions : {0}".format(self.predictions))
             self.processed_files += [current_file]
             time.sleep(self.time_frame / 2)
 

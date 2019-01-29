@@ -187,7 +187,7 @@ class RuleBasedAnomaly:
                     # print method_name + "\t" + str(col_i) + "\t" + str(row[col_i])
                     break
             prediction.append(pred)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         return prediction
 
 
@@ -217,7 +217,7 @@ class RuleBasedAnomaly:
         '''
     checks foreach column if its values must contain V digits
     '''
-        method_name = "same digits number"
+        # method_name = "same digits number"
         prediction = [[Conf.POSITIVE_LABEL] * len(dataset)]
         for col_i in self.cols_digits.keys():
             dig = self.cols_digits[col_i]
@@ -229,34 +229,34 @@ class RuleBasedAnomaly:
     def transform_positive_values(self, type, dataset):
         method_name = "positive values"
         pos_prediction = self.__column_checker_on_testing(dataset, self.pos_columns, lambda x: x > 0)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(pos_prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(pos_prediction))
         return pos_prediction
 
     def transform_negative_values(self, type, dataset):
         method_name = "negative values"
         neg_prediction = self.__column_checker_on_testing(dataset, self.neg_columns, lambda x: x < 0)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(neg_prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(neg_prediction))
         print neg_prediction
         return neg_prediction
 
     def transform_not_negative_values(self, type, dataset):
         method_name = "not negative values"
         no_neg_prediction = self.__column_checker_on_testing(dataset, self.not_neg_columns, lambda x: x >= 0)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(no_neg_prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(no_neg_prediction))
         print no_neg_prediction
         return no_neg_prediction
 
     def transform_exactly_one_value(self, type, dataset):
         method_name = "exactly one"
         prediction = self.__checking_columns_values(dataset, self.one_value_columns)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
 
     def transform_coverage_percentage_columns(self, type, dataset):
         method_name = "coverage percentage columns"
         prediction = self.__checking_columns_values(dataset, self.cov_percen_columns)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
 
@@ -268,16 +268,16 @@ class RuleBasedAnomaly:
             if self.__fulfill_column_constains(a, b):
                 new_labeling = self.__check_bit_column_values(dataset, col_i)
                 prediction = self.__intersection_labeling(prediction, new_labeling)
-        self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
 
-    def __update_methods_stat(self, type, key, values):
-        pos_value, neg_value = values
-        try:
-            self.methods_stats[type][key].update(pos_value, neg_value)
-        except KeyError as e:
-            self.methods_stats[type][key] = NegPos(pos_value, neg_value)
+    # def __update_methods_stat(self, type, key, values):
+    #     pos_value, neg_value = values
+    #     try:
+    #         self.methods_stats[type][key].update(pos_value, neg_value)
+    #     except KeyError as e:
+    #         self.methods_stats[type][key] = NegPos(pos_value, neg_value)
 
     def __count_negative_predictions(self, predication):
         neg_value = len(filter(lambda x: x == Conf.NEGATIVE_LABEL, predication))

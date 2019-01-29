@@ -12,6 +12,8 @@ def Run_Scenario(scen_obj):
     subprocess.Popen(launch_cmd, shell=True)
     apply_statistics()
     time.sleep(SLEEPING_TIME)
+    run = "roslaunch plp_monitors plp.launch"
+    subprocess.Popen(run, shell=True)
     #run_rviz()
     apply_diagnostic()
     # topics = scen_obj.get_topics_list()

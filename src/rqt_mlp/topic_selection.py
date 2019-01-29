@@ -2,7 +2,7 @@ import rosgraph
 import RunScenarios as S
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QFileDialog, QLineEdit, QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
+from python_qt_binding.QtWidgets import QFont, QFileDialog, QLineEdit, QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
     QCheckBox, QScrollArea, QPushButton
 from .node_selection import NodeSelection
 from MyQCheckBox import MyQCheckBox
@@ -14,7 +14,7 @@ import logging
 # logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
-    recordSettingsSelected = Signal(list, dict, int, float, int, str)
+    recordSettingsSelected = Signal(list, dict, int, float, int, str, str)
 
     def __init__(self):
         super(TopicSelection, self).__init__()
@@ -32,6 +32,7 @@ class TopicSelection(QWidget):
         # print all_topics.keys()[0]
         self.plp_filename = ""
         self.rule_filename = ""
+        self.csv_filename = ""
         self.group_selected_items = dict()
         self.group_areas = dict()
         self.group_main_widget = dict()
@@ -87,56 +88,7 @@ class TopicSelection(QWidget):
         self.select_path.setEnabled(False)
         self.save_path.setEnabled(False)
 
-        self.clear_topic_button = QPushButton("Clear Topics List", self)
-        self.clear_topic_button.clicked.connect(self.onClearTopicClicked)
-
-        self.topic_button = QPushButton("Generate Topics List", self)
-        self.topic_button.clicked.connect(self.onTopicsClicked)
-
-        self.main_vlayout.addWidget(self.topic_button)
-        self.main_vlayout.addWidget(self.clear_topic_button)
-
-        self.plp_button = QPushButton("Select PLP Python File...", self)
-        self.plp_button.clicked.connect(self.onPlpClicked)
-
-        self.two_buttons1 = QHBoxLayout(self)
-
-        self.two_buttons1.addWidget(self.plp_button)
-
-        self.two_buttons1.addWidget(self.select_path)
-
-        self.main_vlayout.addLayout(self.two_buttons1)
-
-        # self.label = QLabel("live Topics", self)
-        # self.label.setAlignment(Qt.AlignCenter)
-        #
-        # self.main_vlayout.addWidget(self.label)
-
-        # self.area = QScrollArea(self)
-        # self.main_widget = QWidget(self.area)
-
-        self.ok_button = QPushButton("Record", self)
-        self.ok_button.clicked.connect(self.onButtonClicked)
-
-        self.online_button = QPushButton("Record Online", self)
-        self.online_button.clicked.connect(self.onRecordButtonClicked)
-
-        self.two_buttons2 = QHBoxLayout(self)
-
-        self.interval_length = QLineEdit(self)
-        self.interval_length.setText("3")
-
-        self.label5 = QLabel("interval length:", self)
-
-        self.two_buttons2.addWidget(self.label5)
-
-        self.two_buttons2.addWidget(self.interval_length)
-
-        self.threshold = QLineEdit(self)
-        self.threshold.setText("2")
-
-        self.ok_button.setEnabled(False)
-        self.choose_button = QPushButton("Get Last Export Choose", self)
+        self.choose_button = QPushButton("Get Last Record Choose", self)
         self.choose_button.clicked.connect(self.onButtonChooseCliked)
 
         self.clear_button = QPushButton("Clear Selection", self)
@@ -150,6 +102,110 @@ class TopicSelection(QWidget):
 
         self.main_vlayout.addLayout(self.choose_clear_buttons)
 
+        self.label6 = QLabel("1. Make topics list by scenario:", self)
+        # self.label6.setAlignment(Qt.AlignCenter)
+        print QFont().family()
+        self.label6.setFont(QFont("Ubuntu", weight=QFont.Bold))
+
+
+        # self.main_vlayout.addWidget(self.label6)
+
+        self.clear_topic_button = QPushButton("Delete all topics list", self)
+        self.clear_topic_button.clicked.connect(self.onClearTopicClicked)
+
+        self.topic_button = QPushButton("Generate and add to topics list", self)
+        self.topic_button.clicked.connect(self.onTopicsClicked)
+
+        # self.main_vlayout.addWidget(self.topic_button)
+        # self.main_vlayout.addWidget(self.clear_topic_button)
+
+        self.choose_clear_buttons1 = QHBoxLayout(self)
+
+        self.choose_clear_buttons1.addWidget(self.label6)
+
+        self.choose_clear_buttons1.addWidget(self.topic_button)
+
+        self.choose_clear_buttons1.addWidget(self.clear_topic_button)
+
+        self.main_vlayout.addLayout(self.choose_clear_buttons1)
+
+        self.label7 = QLabel("2. Record bags:", self)
+        self.label7.setFont(QFont("Ubuntu", weight=QFont.Bold))
+        # self.label7.setAlignment(Qt.AlignCenter)
+        # self.main_vlayout.addWidget(self.label7)
+
+        self.plp_button = QPushButton("Select PLP Python File...", self)
+        self.plp_button.clicked.connect(self.onPlpClicked)
+
+        self.ok_button = QPushButton("Record", self)
+        self.ok_button.clicked.connect(self.onButtonClicked)
+
+        self.two_buttons1 = QHBoxLayout(self)
+
+        self.two_buttons1.addWidget(self.label7)
+
+        self.two_buttons1.addWidget(self.plp_button)
+
+        self.two_buttons1.addWidget(self.select_path)
+
+        self.two_buttons1.addWidget(self.ok_button)
+
+        self.main_vlayout.addLayout(self.two_buttons1)
+
+        # self.label = QLabel("live Topics", self)
+        # self.label.setAlignment(Qt.AlignCenter)
+        #
+        # self.main_vlayout.addWidget(self.label)
+
+        # self.area = QScrollArea(self)
+        # self.main_widget = QWidget(self.area)
+
+        # self.main_vlayout.addWidget(self.ok_button)
+
+        self.label8 = QLabel("3. Check online:", self)
+        self.label8.setFont(QFont("Ubuntu", weight=QFont.Bold))
+        # self.label8.setAlignment(Qt.AlignCenter)
+        # self.main_vlayout.addWidget(self.label8)
+
+        self.online_button = QPushButton("Record Online", self)
+        self.online_button.clicked.connect(self.onRecordButtonClicked)
+
+        # self.two_buttons2 = QHBoxLayout(self)
+
+        self.interval_length = QLineEdit(self)
+        self.interval_length.setText("0.25")
+
+        self.label5 = QLabel("interval length:", self)
+
+        # self.two_buttons2.addWidget(self.label5)
+        #
+        # self.two_buttons2.addWidget(self.interval_length)
+
+        self.label6 = QLabel("Threshold:", self)
+
+        self.threshold = QLineEdit(self)
+        self.threshold.setText("7")
+
+        self.two_buttons5 = QHBoxLayout(self)
+
+        self.two_buttons5.addWidget(self.label8)
+
+        self.two_buttons5.addWidget(self.label5)
+
+        self.two_buttons5.addWidget(self.interval_length)
+
+        self.two_buttons5.addWidget(self.label6)
+
+        self.two_buttons5.addWidget(self.threshold)
+
+        self.two_buttons5.addWidget(self.online_button)
+
+        self.main_vlayout.addLayout(self.two_buttons5)
+
+        self.ok_button.setEnabled(False)
+
+        self.ok = False
+
         # self.main_vlayout.addRow(self.choose_button, self.clear_button)
 
         # self.from_nodes_button = QPushButton("From Nodes", self)
@@ -157,12 +213,12 @@ class TopicSelection(QWidget):
 
         # self.main_vlayout.addWidget(self.area)
         # self.main_vlayout.addWidget(self.choose_button)
-        self.main_vlayout.addWidget(self.ok_button)
-        self.main_vlayout.addWidget(self.online_button)
 
-        self.main_vlayout.addLayout(self.two_buttons2)
+        # self.main_vlayout.addWidget(self.online_button)
 
-        self.main_vlayout.addWidget(self.threshold)
+        # self.main_vlayout.addLayout(self.two_buttons2)
+
+        # self.main_vlayout.addWidget(self.threshold)
 
         self.rule_button = QPushButton("Select Rules File...", self)
         self.rule_button.clicked.connect(self.onRuleClicked)
@@ -176,6 +232,23 @@ class TopicSelection(QWidget):
         self.two_buttons4.addWidget(self.select_path1)
 
         self.main_vlayout.addLayout(self.two_buttons4)
+
+        self.csv_button = QPushButton("Select Csv Topics List", self)
+        self.csv_button.clicked.connect(self.onCsvClicked)
+
+        self.select_path2 = QLineEdit()
+
+        self.two_buttons7 = QHBoxLayout(self)
+
+        self.two_buttons7.addWidget(self.csv_button)
+
+        self.two_buttons7.addWidget(self.select_path2)
+
+        self.main_vlayout.addLayout(self.two_buttons7)
+
+        self.online_button.setEnabled(False)
+
+        self.online = False
 
         # self.main_vlayout.addWidget(self.from_nodes_button)
         self.setLayout(self.main_vlayout)
@@ -414,19 +487,22 @@ class TopicSelection(QWidget):
         # if self.plp_filename != "":
         #     from .plp import Plp
         #     Plp(self.plp_filename)
-        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 2, float(self.interval_length.text()), int(self.threshold.text()), "")
+        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 2, float(self.interval_length.text()), int(self.threshold.text()), "", self.plp_filename)
 
     def onRecordButtonClicked(self):
-        for item in self.group_selected_items.values():
-            if item:
-                for i in item:
-                    self.selected_topics.append(i)
-        topics = self.selected_topics
-        with open(get_path() + 'logger_topic.log', "w") as f:
-            for topic in topics:
-                f.write(topic + "\n")
+        # for item in self.group_selected_items.values():
+        #     if item:
+        #         for i in item:
+        #             self.selected_topics.append(i)
+        # topics = self.selected_topics
+        # with open(get_path() + 'logger_topic.log', "w") as f:
+        #     for topic in topics:
+        #         f.write(topic + "\n")
+        if self.csv_filename != "":
+            with open(self.csv_filename, 'r') as f:
+                self.selected_topics_csv = f.read().splitlines()
         self.close()
-        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 3, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename)
+        self.recordSettingsSelected.emit(self.selected_topics_csv, self.map_answer, 3, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename, self.plp_filename)
 
 
     def get_current_opened_directory(self, filepath):
@@ -443,9 +519,9 @@ class TopicSelection(QWidget):
         filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/save_plp.log"
         current_directory = self.get_current_opened_directory(filepath)
         fd = QFileDialog(self)
-        wc = "Csv files {.py} (*.py)"
+        wc = "launch files {.launch} (*.launch)"
         # print current_directory
-        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.py'), directory=current_directory)
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.launch'), directory=current_directory)
         if len(filename):
             self.plp_filename = filename[0]
             with open(filepath, "w") as f:
@@ -454,7 +530,8 @@ class TopicSelection(QWidget):
             # print self.plp_filename[0]
 
     def onTopicsClicked(self):
-        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 1, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename)
+        self.close()
+        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 1, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename, self.plp_filename)
 
     def onClearTopicClicked(self):
         import os, inspect
@@ -463,6 +540,17 @@ class TopicSelection(QWidget):
             os.remove(filepath)
         else:
             print("The file does not exist")
+        filepath1 = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/topics/empty_topics.txt"
+        if os.path.exists(filepath1):
+            os.remove(filepath1)
+        else:
+            print("The file does not exist")
+        filepath2 = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/topics/more_than_1MB.txt"
+        if os.path.exists(filepath2):
+            os.remove(filepath2)
+        else:
+            print("The file does not exist")
+        self.close()
 
     def onRuleClicked(self):
         import inspect, os
@@ -474,7 +562,30 @@ class TopicSelection(QWidget):
         filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.json'), directory=current_directory)
         if len(filename):
             self.rule_filename = filename[0]
+            with open(filepath, "w") as f:
+                f.write(self.rule_filename)
+                self.ok = True
+            if self.ok is True and self.online is True:
+                self.online_button.setEnabled(True)
             self.select_path1.setText(self.rule_filename)
+
+    def onCsvClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/csv_topic.log"
+        print filepath
+        current_directory = self.get_current_opened_directory(filepath)
+        fd = QFileDialog(self)
+        wc = "txt files {.txt} (*.txt)"
+        # print current_directory
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        if len(filename):
+            self.csv_filename = filename[0]
+            with open(filepath, "w") as f:
+                f.write(self.csv_filename)
+                self.online = True
+            if self.ok is True and self.online is True:
+                self.online_button.setEnabled(True)
+            self.select_path2.setText(self.csv_filename)
 
     def onFromNodesButtonClicked(self):
         self.node_selection = NodeSelection(self)

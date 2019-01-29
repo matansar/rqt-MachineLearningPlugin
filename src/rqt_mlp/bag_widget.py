@@ -141,7 +141,7 @@ class BagWidget(QWidget):
             # time.sleep(10)
                 with open(get_path() + "logger_topic.log", 'r') as f:
                     topics = f.read().splitlines()
-                self.start_recording(record_filename, selected_scenario, topics, 2, 0, 0, "")
+                self.start_recording(record_filename, selected_scenario, topics, 2, 0, 0, "", "")
         except IOError:
             return
 
@@ -277,7 +277,7 @@ class BagWidget(QWidget):
                 direc = pathes.rsplit('/', 1)[0]
         return direc
 
-    def _on_record_settings_selected(self, selected_topics, selected_scenario, action_id, time_interval, threshold, rule_filename):
+    def _on_record_settings_selected(self, selected_topics, selected_scenario, action_id, time_interval, threshold, rule_filename, plp_filename):
         record_filename = ""
         if action_id != 1:
             # TODO verify master is still running
@@ -294,16 +294,16 @@ class BagWidget(QWidget):
                     record_filename = record_filename + ".bag"
 
                 rospy.loginfo('Recording to %s.' % record_filename)
-                self.start_recording(record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+                self.start_recording(record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename)
         else:
-            self.start_recording(record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+            self.start_recording(record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename)
 
-    def start_recording(self, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename):
+    def start_recording(self, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename):
         if action_id != 1:
             self._timeline.setBagWidget(self)
 
             self._recording = True
-            self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+            self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename)
             self.run_scen.run_record_scenario()
 
             self.load_button.setEnabled(False)
@@ -313,7 +313,7 @@ class BagWidget(QWidget):
             self.record_button.setToolTip("Pause")
             self.record_button.setIcon(QIcon.fromTheme('media-playback-pause'))
         else:
-            self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename)
+            self.run_scen = S.RunScenario(self._timeline, record_filename, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename)
             self.run_scen.run_record_scenario()
 
     def get_current_opened_directory(self, filepath):
