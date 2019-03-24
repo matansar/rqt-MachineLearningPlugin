@@ -554,9 +554,9 @@ class TopicSelection(QWidget):
         wc = "launch files {.launch} (*.launch)"
         # print current_directory
         # for ubuntu 14
-        # filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.launch'), directory=current_directory)
-        filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.launch'),
-                                                        directory=current_directory)
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.launch'), directory=current_directory)
+        # filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.launch'),
+        #                                                 directory=current_directory)
         if len(filename):
             self.plp_filename = filename[0]
             with open(filepath, "w") as f:
@@ -595,9 +595,9 @@ class TopicSelection(QWidget):
         wc = "json files {.json} (*.json)"
         # print current_directory
         # for ubuntu 14
-        # filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.json'), directory=current_directory)
-        filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.json'),
-                                                        directory=current_directory)
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.json'), directory=current_directory)
+        # filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.json'),
+        #                                                 directory=current_directory)
         if len(filename):
             self.rule_filename = filename[0]
             with open(filepath, "w") as f:
@@ -652,8 +652,8 @@ class TopicSelection(QWidget):
         wc = "txt files {.txt} (*.txt)"
         # print current_directory
         # for ubuntu 14
-        # filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
-        filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        # filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.txt'), directory=current_directory)
         if len(filename):
             self.csv_filename = filename[0]
             with open(filepath, "w") as f:

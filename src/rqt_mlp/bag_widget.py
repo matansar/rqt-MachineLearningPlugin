@@ -337,8 +337,8 @@ class BagWidget(QWidget):
         fd = QFileDialog(self)
         wc = "Bag files {.bag} (*.bag)"
         # for ubuntu 14
-        # path, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.bag'), directory=current_directory)
-        path, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.bag'), directory=current_directory)
+        path, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.bag'), directory=current_directory)
+        # path, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.bag'), directory=current_directory)
         # print path
         if len(path) != 0:
             with open(filepath, "w") as f:
