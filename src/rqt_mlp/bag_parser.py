@@ -259,9 +259,9 @@ class BagParser(QWidget):
         for checkbox in self.items_list_topics:
                 checkbox.setCheckState(Qt.Unchecked)
         with open(get_path() + "logger.log", 'r') as f:
-            topics = f.read().splitlines()
+            choose = f.read().splitlines()
         for checkbox in self.items_list_topics:
-            if checkbox.text() in topics:
+            if checkbox.text() in choose:
                 checkbox.setCheckState(Qt.Checked)
 
     def get_current_opened_directory(self, filepath):
@@ -311,6 +311,12 @@ class BagParser(QWidget):
                 with open(get_path() + 'csv_topics.txt', "w") as f:
                     for topic in topics:
                         f.write(topic + "\n")
+                with open(get_path() + 'specific_features.txt', "w") as f:
+                    for topic1 in specific_features_selection:
+                        f.write(topic1 + "\n")
+                with open(get_path() + 'general_features.txt', "w") as f:
+                    for topic2 in general_features_selection:
+                        f.write(topic2 + "\n")
                 ef = E.ExtractFeatures(topics, float(item), specific_features_selection, general_features_selection)
                 counter = 0
                 for bag_file in self.bag_files:

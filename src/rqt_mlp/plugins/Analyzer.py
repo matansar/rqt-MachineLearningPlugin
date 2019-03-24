@@ -5,7 +5,6 @@ import time
 import logging
 
 from ExtractFeatures import *
-# from AnomalyDetection import *
 import RuleBasedAnomaly as RBA
 from Style import Configure as Conf
 
@@ -13,15 +12,15 @@ logger = logging.getLogger("Analyzer")
 
 class Analyzer(object):
 
-    TIME_LOWER_BOUND = 1.75
+    TIME_LOWER_BOUND = 2
 
-    def __init__(self, dir_path, time_frame, threshold, topics, rules_file_path):
+    def __init__(self, dir_path, time_frame, threshold, topics, rules_file_path, general_filename, sepecific_filename):
         self.time_frame = time_frame
         self.dir_path = dir_path
         self.rules_file_path = rules_file_path
         self.threshold = threshold
         self.processed_files = []
-        self.features_extractor = ExtractFeatures(topics, time_frame, get_specific_features_options(), get_general_features_options())
+        self.features_extractor = ExtractFeatures(topics, time_frame, sepecific_filename, general_filename)
         self.predictions = []
         self.time_passed = 0
         self.rba = {}
@@ -52,7 +51,6 @@ class Analyzer(object):
                 return file
         return None
 
-
     def remove_rows_from(self, delete, *datasets_types):
         def remove_from(df):
             return df[delete: -delete]
@@ -63,7 +61,7 @@ class Analyzer(object):
             ret.append(map(lambda df: remove_from(df), dfs))
         return ret
 
-    def get_bag_prediction(self, file, rules):
+    def get_bag_prediction(self, file):
         df = self.features_extractor.generate_features(file)
         if df.empty:
             return
@@ -79,7 +77,7 @@ class Analyzer(object):
         # write_to_csv("{0}.csv".format(file), df)
         # print "#######################Bag was converted to CSV #######################"
         try:
-            prediction = self.apply_rba(self.rba, df, rules)
+            prediction = self.apply_rba(self.rba, df)
             self.predictions += prediction
         except Exception as e:
             print "################### Exception message : {0} ###############".format(str(e))
@@ -91,15 +89,15 @@ class Analyzer(object):
         print "################ Longest invalid prediction : {0} ################".format(self.get_longest_invalid_seq_length())
         logger.info("################ Longest invalid prediction : {0} ################".format(self.get_longest_invalid_seq_length()))
 
-    def apply_rba(self, rba, dataset, rules):
+    def apply_rba(self, rba, dataset):
         type = Conf.TRAINING
-        # new_datasets = []
 
-        rules_functions = [rba.transform_same_digits_number,
+        rules_functions = [rba.transform_bound,
+                           rba.transform_coverage_percentage_columns,
+                           rba.transform_same_digits_number,
                            rba.transform_positive_values,
                            rba.transform_negative_values,
                            rba.transform_not_negative_values,
-                           rba.transform_coverage_percentage_columns,
                            rba.transform_exactly_one_value,
                            rba.transform_corresponding_columns]
         pred = 1
@@ -108,16 +106,6 @@ class Analyzer(object):
             if pred[0] == 0:
                 print "Failed on {0}".format(rule_function.__name__)
                 break
-
-        # pred = rba.transform_same_digits_number(type, dataset, rules)
-        # pred = intersection_labeling(pred, rba.transform_positive_values(type, dataset, rules))
-        # pred = intersection_labeling(pred, rba.transform_negative_values(type, dataset, rules))
-        # pred = intersection_labeling(pred, rba.transform_not_negative_values(type, dataset, rules))
-        # pred = intersection_labeling(pred, rba.transform_coverage_percentage_columns(type, dataset, rules))
-        # #pred = intersection_labeling(pred, rba.transform_corresponding_columns(type, dataset))
-        # pred = intersection_labeling(pred, rba.transform_exactly_one_value(type, dataset, rules))
-        # # removable_cols = rba.get_removable_columns()
-        # #new_datasets.append(DS.Datasets.remove_columns(dataset, removable_cols))
         return pred
 
     def get_longest_invalid_seq_length(self):
@@ -163,7 +151,7 @@ class Analyzer(object):
                 time.sleep(self.time_frame / 2)
                 continue
             print("###################Processing the following file : {0}#################".format(current_file))
-            self.get_bag_prediction(current_file, rules)
+            self.get_bag_prediction(current_file)
             if self.get_longest_invalid_seq_length() > self.threshold:
                 self.handle_invalid_file(current_file)
                 # self.stop = False
@@ -176,6 +164,10 @@ class Analyzer(object):
 
 
 if __name__ == "__main__":
-    topics = ['/clock', '/diagnostics', '/gazebo/model_states', '/gazebo/parameter_descriptions', '/gazebo/parameter_updates', '/gripper_controller/gripper_cmd/status', '/host_diagnostic', '/joint_states', '/kinect2/parameter_descriptions', '/kinect2/parameter_updates', '/kinect2/qhd/camera_info', '/kinect2/qhd/image_color/compressed', '/kinect2/qhd/image_color/compressed/parameter_descriptions', '/kinect2/qhd/image_color/compressed/parameter_updates', '/kinect2/qhd/image_color/compressedDepth/parameter_descriptions', '/kinect2/qhd/image_color/compressedDepth/parameter_updates', '/kinect2/qhd/image_color/theora', '/kinect2/qhd/image_color/theora/parameter_descriptions', '/kinect2/qhd/image_color/theora/parameter_updates', '/map_metadata', '/mobile_base_controller/cmd_vel', '/mobile_base_controller/odom', '/move_base/DWAPlannerROS/parameter_descriptions', '/move_base/DWAPlannerROS/parameter_updates', '/move_base/global_costmap/costmap', '/move_base/global_costmap/footprint', '/move_base/global_costmap/inflation_global/parameter_descriptions', '/move_base/global_costmap/inflation_global/parameter_updates', '/move_base/global_costmap/parameter_descriptions', '/move_base/global_costmap/parameter_updates', '/move_base/global_costmap/static/parameter_descriptions', '/move_base/global_costmap/static/parameter_updates', '/move_base/local_costmap/costmap', '/move_base/local_costmap/costmap_updates', '/move_base/local_costmap/footprint', '/move_base/local_costmap/inflation/parameter_descriptions', '/move_base/local_costmap/inflation/parameter_updates', '/move_base/local_costmap/obstacles_laser/parameter_descriptions', '/move_base/local_costmap/obstacles_laser/parameter_updates', '/move_base/local_costmap/parameter_descriptions', '/move_base/local_costmap/parameter_updates', '/move_base/parameter_descriptions', '/move_base/parameter_updates', '/move_base/status', '/move_group/monitored_planning_scene', '/move_group/ompl/parameter_descriptions', '/move_group/ompl/parameter_updates', '/move_group/plan_execution/parameter_descriptions', '/move_group/plan_execution/parameter_updates', '/move_group/planning_scene_monitor/parameter_descriptions', '/move_group/planning_scene_monitor/parameter_updates', '/move_group/sense_for_plan/parameter_descriptions', '/move_group/sense_for_plan/parameter_updates', '/move_group/status', '/move_group/trajectory_execution/parameter_descriptions', '/move_group/trajectory_execution/parameter_updates', '/my_find_object/bw/compressed', '/my_find_object/bw/compressed/parameter_descriptions', '/my_find_object/bw/compressedDepth/parameter_descriptions', '/my_find_object/bw/compressedDepth/parameter_updates', '/my_find_object/bw/theora/parameter_descriptions', '/my_find_object/hsv_filterd/compressed', '/my_find_object/hsv_filterd/compressed/parameter_descriptions', '/my_find_object/hsv_filterd/compressed/parameter_updates', '/my_find_object/hsv_filterd/compressedDepth/parameter_descriptions', '/my_find_object/hsv_filterd/compressedDepth/parameter_updates', '/my_find_object/hsv_filterd/theora', '/my_find_object/hsv_filterd/theora/parameter_descriptions', '/my_find_object/hsv_filterd/theora/parameter_updates', '/my_find_object/result/compressed/parameter_descriptions', '/my_find_object/result/compressed/parameter_updates', '/my_find_object/result/compressedDepth/parameter_descriptions', '/my_find_object/result/compressedDepth/parameter_updates', '/my_find_object/result/theora', '/my_find_object/result/theora/parameter_descriptions', '/my_find_object/result/theora/parameter_updates', '/node_diagnostic', '/pan_tilt_trajectory_controller/follow_joint_trajectory/status', '/pan_tilt_trajectory_controller/point_head_action/status', '/pan_tilt_trajectory_controller/state', '/poseupdate', '/scan', '/slam_cloud', '/slam_gmapping/entropy', '/slam_out_pose', '/statistics', '/tf', '/my_find_object/bw/compressed/parameter_updates', '/my_find_object/bw/theora/parameter_updates']
-    analyzer = Analyzer("/home/lab/bags/online_test", 0.25, 6, topics, "/home/lab/thesis/software/rules.json")
+    with open('/home/lab/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/History_Choosing/general_features.txt') as f:
+        lines1 = f.read().splitlines()
+    with open('/home/lab/catkin_ws/src/rqt_mlp/src/rqt_mlp/Scenarios/History_Choosing/specific_features.txt') as f:
+        lines2 = f.read().splitlines()
+    topics = ['/URF/front', '/arm_trajectory_controller/follow_joint_trajectory/feedback', '/arm_trajectory_controller/follow_joint_trajectory/goal', '/arm_trajectory_controller/follow_joint_trajectory/result', '/arm_trajectory_controller/follow_joint_trajectory/status', '/arm_trajectory_controller/state', '/battery', '/detected_objects', '/diagnostics', '/espeak_node/parameter_descriptions', '/espeak_node/parameter_updates', '/execute_trajectory/feedback', '/execute_trajectory/goal', '/execute_trajectory/status', '/find_object_node/bw/compressed', '/find_object_node/bw/compressed/parameter_descriptions', '/find_object_node/bw/compressed/parameter_updates', '/find_object_node/bw/compressedDepth/parameter_descriptions', '/find_object_node/bw/compressedDepth/parameter_updates', '/find_object_node/bw/theora/parameter_descriptions', '/find_object_node/bw/theora/parameter_updates', '/find_object_node/hsv_filterd/compressed', '/find_object_node/hsv_filterd/compressed/parameter_descriptions', '/find_object_node/hsv_filterd/compressed/parameter_updates', '/find_object_node/hsv_filterd/compressedDepth/parameter_descriptions', '/find_object_node/hsv_filterd/compressedDepth/parameter_updates', '/find_object_node/hsv_filterd/theora', '/find_object_node/hsv_filterd/theora/parameter_descriptions', '/find_object_node/hsv_filterd/theora/parameter_updates', '/find_object_node/object_pose', '/find_object_node/parameter_descriptions', '/find_object_node/parameter_updates', '/find_object_node/result/compressed', '/find_object_node/result/compressed/parameter_updates', '/find_object_node/result/compressedDepth/parameter_descriptions', '/find_object_node/result/compressedDepth/parameter_updates', '/find_object_node/result/theora', '/find_object_node/result/theora/parameter_descriptions', '/find_object_node/result/theora/parameter_updates', '/gripper_controller/current_gap', '/gripper_controller/gripper_cmd/goal', '/gripper_controller/gripper_cmd/result', '/gripper_controller/gripper_cmd/status', '/host_diagnostic', '/joint_states', '/kinect2/bond', '/kinect2/hd/camera_info', '/kinect2/qhd/camera_info', '/kinect2/sd/camera_info', '/mobile_base_controller/odom', '/move_group/display_planned_path', '/move_group/feedback', '/move_group/goal', '/move_group/monitored_planning_scene', '/move_group/ompl/parameter_descriptions', '/move_group/ompl/parameter_updates', '/move_group/pick_place/parameter_descriptions', '/move_group/pick_place/parameter_updates', '/move_group/plan_execution/parameter_descriptions', '/move_group/plan_execution/parameter_updates', '/move_group/planning_scene_monitor/parameter_descriptions', '/move_group/planning_scene_monitor/parameter_updates', '/move_group/result', '/move_group/sense_for_plan/parameter_descriptions', '/move_group/sense_for_plan/parameter_updates', '/move_group/status', '/move_group/trajectory_execution/parameter_descriptions', '/move_group/trajectory_execution/parameter_updates', '/node_diagnostic', '/pan_tilt_trajectory_controller/follow_joint_trajectory/status', '/pan_tilt_trajectory_controller/state', '/pickup/feedback', '/pickup/goal', '/pickup/result', '/pickup/status', '/place/feedback', '/place/goal', '/place/result', '/place/status', '/tf', '/tf_static', '/torso_effort_controller/pid/parameter_descriptions', '/torso_effort_controller/pid/parameter_updates', '/torso_effort_controller/state']
+    analyzer = Analyzer("/home/lab/bags/without_cup_5", 1, 3, topics, "/home/lab/GitHub New/thesis_rules/software/rules.json", lines1, lines2)
     analyzer.analyze()

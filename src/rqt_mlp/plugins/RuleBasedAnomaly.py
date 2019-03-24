@@ -36,6 +36,8 @@ class RuleBasedAnomaly:
 
     def fit(self, rules):
 
+        self.bound = self.get_value_by_topic(rules, "bound")
+
         self.cols_digits = self.get_value_by_topic(rules, "same digits number")
 
         self.pos_columns = self.get_list_by_topic(rules, "positive values")
@@ -213,71 +215,58 @@ class RuleBasedAnomaly:
     #     return prediction
 
     # our transform returns new_dataset and its values
+    def transform_bound(self, type, dataset):
+        '''
+    checks foreach column if its values must contain V digits
+    '''
+        prediction = [[Conf.POSITIVE_LABEL] * len(dataset)]
+        for col_i in self.bound.keys():
+            var = self.bound[col_i]
+            for item in var.keys():
+                if item == "high":
+                    high = var[item]
+                elif item == "low":
+                    low = var[item]
+                elif item == "abs":
+                    abs = var[item]
+            prediction.append(self.__column_checker_on_bound(dataset, [col_i], high, low, abs))
+        prediction = self.__intersection_labeling(*prediction)
+        return prediction
+
     def transform_same_digits_number(self, type, dataset):
         '''
     checks foreach column if its values must contain V digits
     '''
-        # method_name = "same digits number"
         prediction = [[Conf.POSITIVE_LABEL] * len(dataset)]
         for col_i in self.cols_digits.keys():
             dig = self.cols_digits[col_i]
             prediction.append(self.__column_checker_on_testing(dataset, [col_i], lambda x: self.__digit(x) == dig))
-        prediction = self.__intersection_labeling(*prediction)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
+        # prediction = self.__intersection_labeling(*prediction)
         return prediction
 
     def transform_positive_values(self, type, dataset):
-        method_name = "positive values"
         pos_prediction = self.__column_checker_on_testing(dataset, self.pos_columns, lambda x: x > 0)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(pos_prediction))
         return pos_prediction
 
     def transform_negative_values(self, type, dataset):
-        method_name = "negative values"
         neg_prediction = self.__column_checker_on_testing(dataset, self.neg_columns, lambda x: x < 0)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(neg_prediction))
         print neg_prediction
         return neg_prediction
 
     def transform_not_negative_values(self, type, dataset):
-        method_name = "not negative values"
         no_neg_prediction = self.__column_checker_on_testing(dataset, self.not_neg_columns, lambda x: x >= 0)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(no_neg_prediction))
         print no_neg_prediction
         return no_neg_prediction
 
     def transform_exactly_one_value(self, type, dataset):
-        method_name = "exactly one"
         prediction = self.__checking_columns_values(dataset, self.one_value_columns)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
 
     def transform_coverage_percentage_columns(self, type, dataset):
-        method_name = "coverage percentage columns"
         prediction = self.__checking_columns_values(dataset, self.cov_percen_columns)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
         print prediction
         return prediction
-
-    def transform_bit_same_column_values(self, type, dataset):
-        method_name = "a bit same values"
-        prediction = [Conf.POSITIVE_LABEL] * dataset.shape[ROWS_INDEX]  # all samples are ok, until we find something
-        for col_i in self.min_max_values.keys():
-            a, b = self.min_max_values[col_i]
-            if self.__fulfill_column_constains(a, b):
-                new_labeling = self.__check_bit_column_values(dataset, col_i)
-                prediction = self.__intersection_labeling(prediction, new_labeling)
-        # self.__update_methods_stat(type, method_name, self.__count_negative_predictions(prediction))
-        print prediction
-        return prediction
-
-    # def __update_methods_stat(self, type, key, values):
-    #     pos_value, neg_value = values
-    #     try:
-    #         self.methods_stats[type][key].update(pos_value, neg_value)
-    #     except KeyError as e:
-    #         self.methods_stats[type][key] = NegPos(pos_value, neg_value)
 
     def __count_negative_predictions(self, predication):
         neg_value = len(filter(lambda x: x == Conf.NEGATIVE_LABEL, predication))
@@ -324,8 +313,12 @@ class RuleBasedAnomaly:
         return ret
 
     def __canonicalize_scientific_number(self, number):
-        if  number > 9999999999999999: #isinstance(number, numpy.float64) and
+        if number > 9999999999999999: #isinstance(number, numpy.float64) and
             number = float('{:0.5e}'.format(number))
+        if number < 0.02:
+            number = float('{:0.2e}'.format(number))
+        if 0.7 < number < 0.71:
+            number = float('{:0.10e}'.format(number))
         return number
 
     def  __checking_columns_values(self, dataset, map_values):
@@ -425,6 +418,21 @@ class RuleBasedAnomaly:
             labeling.append(pred)
         return labeling
 
+    def __column_checker_on_bound(self, dataset, columns, high, low, abs):
+        '''
+    checks that the following @columns setisfy the predicate
+    '''
+        labeling = []
+        for _, row in dataset.iterrows():
+            pred = Conf.POSITIVE_LABEL
+            for col_i in columns:
+                if not self.__check_by_bound(row[col_i], high, low, abs):
+                    print str(col_i) + " " + str(row[col_i])
+                    pred = Conf.NEGATIVE_LABEL
+            labeling.append(pred)
+        return labeling
+
+
     def __count_digits(self, dataset):
         def count_digit_of(col_i):
             # print dataset[col_i]
@@ -503,6 +511,16 @@ class RuleBasedAnomaly:
         #     number = 9223372036854775807
         number = int(abs(number))
         return len(str(number))
+
+    def __check_by_bound(self, number, high, low, abs1):
+        result = False
+        if abs1 == 1:
+            if low <= abs(number) < high:
+                result = True
+        else:
+            if low <= number < high:
+                result = True
+        return result
 
     def __str__(self):
         def map_values(type, m):

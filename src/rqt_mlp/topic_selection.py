@@ -2,7 +2,7 @@ import rosgraph
 import RunScenarios as S
 import TimeSeriesFeatures as TS
 from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtWidgets import QFont, QFileDialog, QLineEdit, QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
+from python_qt_binding.QtWidgets import QFileDialog, QLineEdit, QHBoxLayout, QFormLayout, QRadioButton, QButtonGroup, QLabel, QWidget, QVBoxLayout, \
     QCheckBox, QScrollArea, QPushButton
 from .node_selection import NodeSelection
 from MyQCheckBox import MyQCheckBox
@@ -14,7 +14,7 @@ import logging
 # logger_topic = logging.getLogger("logger_topic")
 
 class TopicSelection(QWidget):
-    recordSettingsSelected = Signal(list, dict, int, float, int, str, str)
+    recordSettingsSelected = Signal(list, list, list, dict, int, float, int, str, str)
 
     def __init__(self):
         super(TopicSelection, self).__init__()
@@ -104,8 +104,8 @@ class TopicSelection(QWidget):
 
         self.label6 = QLabel("1. Make topics list by scenario:", self)
         # self.label6.setAlignment(Qt.AlignCenter)
-        print QFont().family()
-        self.label6.setFont(QFont("Ubuntu", weight=QFont.Bold))
+        # print QFont().family()
+        # self.label6.setFont(QFont("Ubuntu", weight=QFont.Bold))
 
 
         # self.main_vlayout.addWidget(self.label6)
@@ -130,7 +130,7 @@ class TopicSelection(QWidget):
         self.main_vlayout.addLayout(self.choose_clear_buttons1)
 
         self.label7 = QLabel("2. Record bags:", self)
-        self.label7.setFont(QFont("Ubuntu", weight=QFont.Bold))
+        # self.label7.setFont(QFont("Ubuntu", weight=QFont.Bold))
         # self.label7.setAlignment(Qt.AlignCenter)
         # self.main_vlayout.addWidget(self.label7)
 
@@ -163,7 +163,7 @@ class TopicSelection(QWidget):
         # self.main_vlayout.addWidget(self.ok_button)
 
         self.label8 = QLabel("3. Check online:", self)
-        self.label8.setFont(QFont("Ubuntu", weight=QFont.Bold))
+        # self.label8.setFont(QFont("Ubuntu", weight=QFont.Bold))
         # self.label8.setAlignment(Qt.AlignCenter)
         # self.main_vlayout.addWidget(self.label8)
 
@@ -245,6 +245,32 @@ class TopicSelection(QWidget):
         self.two_buttons7.addWidget(self.select_path2)
 
         self.main_vlayout.addLayout(self.two_buttons7)
+
+        self.general_button1 = QPushButton("Select general features list", self)
+        self.general_button1.clicked.connect(self.onGeneralClicked)
+
+        self.select_path3 = QLineEdit()
+
+        self.two_buttons8 = QHBoxLayout(self)
+
+        self.two_buttons8.addWidget(self.general_button1)
+
+        self.two_buttons8.addWidget(self.select_path3)
+
+        self.main_vlayout.addLayout(self.two_buttons8)
+
+        self.csv_button2 = QPushButton("Select specific features list", self)
+        self.csv_button2.clicked.connect(self.onSpecificClicked)
+
+        self.select_path4 = QLineEdit()
+
+        self.two_buttons9 = QHBoxLayout(self)
+
+        self.two_buttons9.addWidget(self.csv_button2)
+
+        self.two_buttons9.addWidget(self.select_path4)
+
+        self.main_vlayout.addLayout(self.two_buttons9)
 
         self.online_button.setEnabled(False)
 
@@ -487,7 +513,7 @@ class TopicSelection(QWidget):
         # if self.plp_filename != "":
         #     from .plp import Plp
         #     Plp(self.plp_filename)
-        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 2, float(self.interval_length.text()), int(self.threshold.text()), "", self.plp_filename)
+        self.recordSettingsSelected.emit([], [], self.selected_topics, self.map_answer, 2, float(self.interval_length.text()), int(self.threshold.text()), "", self.plp_filename)
 
     def onRecordButtonClicked(self):
         # for item in self.group_selected_items.values():
@@ -501,8 +527,14 @@ class TopicSelection(QWidget):
         if self.csv_filename != "":
             with open(self.csv_filename, 'r') as f:
                 self.selected_topics_csv = f.read().splitlines()
+        if self.general_filename != "":
+            with open(self.general_filename, 'r') as f:
+                self.general_filename_read = f.read().splitlines()
+        if self.csv_filename != "":
+            with open(self.specific_filename, 'r') as f:
+                self.specific_filename_read = f.read().splitlines()
         self.close()
-        self.recordSettingsSelected.emit(self.selected_topics_csv, self.map_answer, 3, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename, self.plp_filename)
+        self.recordSettingsSelected.emit(self.general_filename_read, self.specific_filename_read, self.selected_topics_csv, self.map_answer, 3, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename, self.plp_filename)
 
 
     def get_current_opened_directory(self, filepath):
@@ -521,7 +553,10 @@ class TopicSelection(QWidget):
         fd = QFileDialog(self)
         wc = "launch files {.launch} (*.launch)"
         # print current_directory
-        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.launch'), directory=current_directory)
+        # for ubuntu 14
+        # filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.launch'), directory=current_directory)
+        filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.launch'),
+                                                        directory=current_directory)
         if len(filename):
             self.plp_filename = filename[0]
             with open(filepath, "w") as f:
@@ -531,7 +566,7 @@ class TopicSelection(QWidget):
 
     def onTopicsClicked(self):
         self.close()
-        self.recordSettingsSelected.emit(self.selected_topics, self.map_answer, 1, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename, self.plp_filename)
+        self.recordSettingsSelected.emit(self.general_filename_read, self.specific_filename_read, self.selected_topics, self.map_answer, 1, float(self.interval_length.text()), int(self.threshold.text()), self.rule_filename, self.plp_filename)
 
     def onClearTopicClicked(self):
         import os, inspect
@@ -559,7 +594,10 @@ class TopicSelection(QWidget):
         fd = QFileDialog(self)
         wc = "json files {.json} (*.json)"
         # print current_directory
-        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.json'), directory=current_directory)
+        # for ubuntu 14
+        # filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.json'), directory=current_directory)
+        filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.json'),
+                                                        directory=current_directory)
         if len(filename):
             self.rule_filename = filename[0]
             with open(filepath, "w") as f:
@@ -569,6 +607,42 @@ class TopicSelection(QWidget):
                 self.online_button.setEnabled(True)
             self.select_path1.setText(self.rule_filename)
 
+    def onGeneralClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/general_list.log"
+        print filepath
+        current_directory = self.get_current_opened_directory(filepath)
+        fd = QFileDialog(self)
+        wc = "txt files {.txt} (*.txt)"
+        # print current_directory
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        if len(filename):
+            self.general_filename = filename[0]
+            with open(filepath, "w") as f:
+                f.write(self.general_filename)
+                # self.online = True
+            # if self.ok is True and self.online is True:
+            #     self.online_button.setEnabled(True)
+            self.select_path3.setText(self.general_filename)
+
+    def onSpecificClicked(self):
+        import inspect, os
+        filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/specific_list.log"
+        print filepath
+        current_directory = self.get_current_opened_directory(filepath)
+        fd = QFileDialog(self)
+        wc = "txt files {.txt} (*.txt)"
+        # print current_directory
+        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        if len(filename):
+            self.specific_filename = filename[0]
+            with open(filepath, "w") as f:
+                f.write(self.specific_filename)
+                # self.online = True
+            # if self.ok is True and self.online is True:
+            #     self.online_button.setEnabled(True)
+            self.select_path4.setText(self.specific_filename)
+
     def onCsvClicked(self):
         import inspect, os
         filepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + "/log/csv_topic.log"
@@ -577,7 +651,9 @@ class TopicSelection(QWidget):
         fd = QFileDialog(self)
         wc = "txt files {.txt} (*.txt)"
         # print current_directory
-        filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        # for ubuntu 14
+        # filename, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.txt'), directory=current_directory)
+        filename, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.txt'), directory=current_directory)
         if len(filename):
             self.csv_filename = filename[0]
             with open(filepath, "w") as f:

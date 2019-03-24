@@ -16,7 +16,7 @@ class RunScenario:
     # ------------------------------------------------------------ constructor ------------------------------------------------------------
 
     # selected_scenario = {id = "", params = {x: value_x}}
-    def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename):
+    def __init__(self, bag_obj, export_bag, selected_scenario, selected_topics, action_id, time_interval, threshold, rule_filename, plp_filename, general_filename_read, specific_filename_read):
         must_topics = ['/host_diagnostic', '/node_diagnostic', '/statistics', "/move_base/feedback"]
         # must_topics = ['/host_statistics', '/node_statistics', '/statistics', "/move_base/feedback"]
         self.__restart_flag = False
@@ -29,6 +29,8 @@ class RunScenario:
         self.__threshold = threshold
         self.__rule_filename = rule_filename
         self.__plp_filename = plp_filename
+        self.__general_filename_read = general_filename_read
+        self.__specific_filename_read = specific_filename_read
 
     # ------------------------------------------------------------ getters ------------------------------------------------------------
 
@@ -80,8 +82,11 @@ class RunScenario:
             subprocess.Popen(goal1, shell=True)
             if self.__action_id == 3:
                 dir_path = os.path.dirname(os.path.realpath(self.__export_bag))
-                # topics = ['/clock', '/diagnostics', '/gazebo/model_states', '/gazebo/parameter_descriptions', '/gazebo/parameter_updates', '/gripper_controller/gripper_cmd/status', '/host_diagnostic', '/joint_states', '/kinect2/parameter_descriptions', '/kinect2/parameter_updates', '/kinect2/qhd/camera_info', '/kinect2/qhd/image_color/compressed', '/kinect2/qhd/image_color/compressed/parameter_descriptions', '/kinect2/qhd/image_color/compressed/parameter_updates', '/kinect2/qhd/image_color/compressedDepth/parameter_descriptions', '/kinect2/qhd/image_color/compressedDepth/parameter_updates', '/kinect2/qhd/image_color/theora', '/kinect2/qhd/image_color/theora/parameter_descriptions', '/kinect2/qhd/image_color/theora/parameter_updates', '/map_metadata', '/mobile_base_controller/cmd_vel', '/mobile_base_controller/odom', '/move_base/DWAPlannerROS/parameter_descriptions', '/move_base/DWAPlannerROS/parameter_updates', '/move_base/global_costmap/costmap', '/move_base/global_costmap/footprint', '/move_base/global_costmap/inflation_global/parameter_descriptions', '/move_base/global_costmap/inflation_global/parameter_updates', '/move_base/global_costmap/parameter_descriptions', '/move_base/global_costmap/parameter_updates', '/move_base/global_costmap/static/parameter_descriptions', '/move_base/global_costmap/static/parameter_updates', '/move_base/local_costmap/costmap', '/move_base/local_costmap/costmap_updates', '/move_base/local_costmap/footprint', '/move_base/local_costmap/inflation/parameter_descriptions', '/move_base/local_costmap/inflation/parameter_updates', '/move_base/local_costmap/obstacles_laser/parameter_descriptions', '/move_base/local_costmap/obstacles_laser/parameter_updates', '/move_base/local_costmap/parameter_descriptions', '/move_base/local_costmap/parameter_updates', '/move_base/parameter_descriptions', '/move_base/parameter_updates', '/move_base/status', '/move_group/monitored_planning_scene', '/move_group/ompl/parameter_descriptions', '/move_group/ompl/parameter_updates', '/move_group/plan_execution/parameter_descriptions', '/move_group/plan_execution/parameter_updates', '/move_group/planning_scene_monitor/parameter_descriptions', '/move_group/planning_scene_monitor/parameter_updates', '/move_group/sense_for_plan/parameter_descriptions', '/move_group/sense_for_plan/parameter_updates', '/move_group/status', '/move_group/trajectory_execution/parameter_descriptions', '/move_group/trajectory_execution/parameter_updates', '/my_find_object/bw/compressed', '/my_find_object/bw/compressed/parameter_descriptions', '/my_find_object/bw/compressedDepth/parameter_descriptions', '/my_find_object/bw/compressedDepth/parameter_updates', '/my_find_object/bw/theora/parameter_descriptions', '/my_find_object/hsv_filterd/compressed', '/my_find_object/hsv_filterd/compressed/parameter_descriptions', '/my_find_object/hsv_filterd/compressed/parameter_updates', '/my_find_object/hsv_filterd/compressedDepth/parameter_descriptions', '/my_find_object/hsv_filterd/compressedDepth/parameter_updates', '/my_find_object/hsv_filterd/theora', '/my_find_object/hsv_filterd/theora/parameter_descriptions', '/my_find_object/hsv_filterd/theora/parameter_updates', '/my_find_object/result/compressed/parameter_descriptions', '/my_find_object/result/compressed/parameter_updates', '/my_find_object/result/compressedDepth/parameter_descriptions', '/my_find_object/result/compressedDepth/parameter_updates', '/my_find_object/result/theora', '/my_find_object/result/theora/parameter_descriptions', '/my_find_object/result/theora/parameter_updates', '/node_diagnostic', '/pan_tilt_trajectory_controller/follow_joint_trajectory/status', '/pan_tilt_trajectory_controller/point_head_action/status', '/pan_tilt_trajectory_controller/state', '/poseupdate', '/scan', '/slam_cloud', '/slam_gmapping/entropy', '/slam_out_pose', '/statistics', '/tf', '/my_find_object/bw/compressed/parameter_updates', '/my_find_object/bw/theora/parameter_updates']
-                analyzer = Analyzer(dir_path, self.__time_interval, self.__threshold, self.__selected_topics, self.__rule_filename)
+                with open(self.__general_filename_read) as f:
+                    lines1 = f.read().splitlines()
+                with open(self.__specific_filename_read) as f:
+                    lines2 = f.read().splitlines()
+                analyzer = Analyzer(dir_path, self.__time_interval, self.__threshold, self.__selected_topics, self.__rule_filename, lines1, lines2)
                 import threading
                 t = threading.Thread(target=analyzer.analyze(), args=())
                 t.daemon = True
@@ -224,6 +229,11 @@ def randomly_obstacles_stuff_corridor_scenario(scn_obj, number_simulations):
 
 def search_can_scenario(scn_obj, number_simulations):
     import Randomaly_Search_Scenario as rss
+    create_restarting_file(scn_obj)
+    rss.Run_Scenario(scn_obj, number_simulations)
+
+def arm_scenario(scn_obj, number_simulations):
+    import Bag_Scenario as rss
     create_restarting_file(scn_obj)
     rss.Run_Scenario(scn_obj, number_simulations)
 
@@ -389,6 +399,12 @@ def create_scenarios():
     name = "search object in the room"
     params = [('number of simulations', 'greater than zero', 0)]
     function = search_can_scenario
+    tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
+    # scenarios 15 -----------------------------------
+    scenario_id = 15
+    name = "arm manipulation"
+    params = [('number of simulations', 'greater than zero', 0)]
+    function = arm_scenario
     tmp_scenarios[scenario_id] = dict(name=name, params=params, function=function)
     return tmp_scenarios
 

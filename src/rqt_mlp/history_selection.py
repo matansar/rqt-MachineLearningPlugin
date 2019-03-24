@@ -243,7 +243,10 @@ class HistorySelection(QWidget):
         wc = "Csv files {.csv} (*.csv)"
         self.files = []
         current_directory = self.get_current_opened_directory(filepath)
-        tmp_pathes, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.csv'),
+        # for ubuntu 14
+        # tmp_pathes, filter = fd.getOpenFileNamesAndFilter(filter=wc, initialFilter=('*.csv'),
+        #                                                   directory=current_directory)
+        tmp_pathes, filter = fd.getOpenFileNames(filter=wc, initialFilter=('*.csv'),
                                                           directory=current_directory)
         for path in tmp_pathes:
             self.files.append(path.encode("utf-8"))
